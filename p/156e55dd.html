@@ -1,0 +1,789 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="https://lsky.ivan-zhang.com.cn/i/2023/10/15/652b853431f84.jpeg">
+  <link rel="icon" href="https://lsky.ivan-zhang.com.cn/i/2023/10/15/652b853431f84.jpeg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ivan Zhang">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="使用键代替Byte 在之前的步骤中，我们直接操作字节。然而，本着“不重复造轮子”的原则，我们可以使用各种库函数已经实现的方法。termion就已经提供了这个方法，它可以将单个字节组合成按键输入，并传递给我们： src&#x2F;main.rs1234567891011121314151617181920212223242526272829use std::io::&amp;#123;self, stdout&amp;#12">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Rust学习-制作一个文本编辑器: Raw Input And Output">
+<meta property="og:url" content="https://zone.ivan-zhang.com.cn/p/156e55dd">
+<meta property="og:site_name" content="Ivan Zone">
+<meta property="og:description" content="使用键代替Byte 在之前的步骤中，我们直接操作字节。然而，本着“不重复造轮子”的原则，我们可以使用各种库函数已经实现的方法。termion就已经提供了这个方法，它可以将单个字节组合成按键输入，并传递给我们： src&#x2F;main.rs1234567891011121314151617181920212223242526272829use std::io::&amp;#123;self, stdout&amp;#12">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://lsky.ivan-zhang.com.cn/i/2023/11/11/654f341780bd6.png">
+<meta property="article:published_time" content="2023-11-14T22:52:50.000Z">
+<meta property="article:modified_time" content="2023-11-16T06:48:07.929Z">
+<meta property="article:author" content="Ivan Zhang">
+<meta property="article:tag" content="Rust">
+<meta property="article:tag" content="TextEditor">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://lsky.ivan-zhang.com.cn/i/2023/11/11/654f341780bd6.png">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+    <meta name="google-site-verification" content="QRmYEV3TU5Xl3W3amshmcmMfL2Vl-TKfcOA9E-TKwR0" />
+  
+  <title>Rust学习-制作一个文本编辑器: Raw Input And Output - Ivan Zone</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_4287002_0rc6vut94t2.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/codeblock.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"zone.ivan-zhang.com.cn","root":"/","version":"1.9.5-a","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Ivan</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('https://lsky.ivan-zhang.com.cn/i/2023/10/15/652ad1ee7547f.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Rust学习-制作一个文本编辑器: Raw Input And Output"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-11-15 06:52" pubdate>
+          2023年11月15日 早上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3.4k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          29 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Rust学习-制作一个文本编辑器: Raw Input And Output</h1>
+            
+              <p class="note note-info">
+                
+                  
+                    本文最后更新于：2023年11月16日 下午
+                  
+                
+              </p>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="使用键代替Byte">使用<code>键</code>代替<code>Byte</code></h2>
+<p>在之前的步骤中，我们直接操作字节。然而，本着“不重复造轮子”的原则，我们可以使用各种库函数已经实现的方法。<code>termion</code>就已经提供了这个方法，它可以将单个字节组合成按键输入，并传递给我们：</p>
+<figure class="highlight rust"><figcaption><span>src/main.rs</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-keyword">use</span> std::io::&#123;<span class="hljs-keyword">self</span>, stdout&#125;;<br><span class="hljs-keyword">use</span> termion::raw::IntoRawMode;<br><span class="hljs-keyword">use</span> termion::event::Key;<br><span class="hljs-keyword">use</span> termion::input::TermRead;<br><br><span class="hljs-keyword">fn</span> <span class="hljs-title function_">die</span>(e: std::io::Error)&#123;<br>    <span class="hljs-built_in">panic!</span>(<span class="hljs-string">&quot;&#123;&#125;&quot;</span>, e);<br>&#125;<br><br><span class="hljs-keyword">fn</span> <span class="hljs-title function_">main</span>() &#123;<br>    <span class="hljs-keyword">let</span> <span class="hljs-variable">_stdout</span> = <span class="hljs-title function_ invoke__">stdout</span>().<span class="hljs-title function_ invoke__">into_raw_mode</span>().<span class="hljs-title function_ invoke__">unwrap</span>();<br>    <br>    <span class="hljs-keyword">for</span> <span class="hljs-variable">key</span> <span class="hljs-keyword">in</span> io::<span class="hljs-title function_ invoke__">stdin</span>().<span class="hljs-title function_ invoke__">keys</span>()&#123;<br>        <span class="hljs-keyword">match</span> key&#123;<br>            <span class="hljs-title function_ invoke__">Ok</span>(key) =&gt; <span class="hljs-keyword">match</span> key&#123;<br>                Key::<span class="hljs-title function_ invoke__">Char</span>(c) =&gt; &#123;<br>                    <span class="hljs-keyword">if</span> c.<span class="hljs-title function_ invoke__">is_control</span>() &#123;<br>                        <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;&#123;:?&#125;\r&quot;</span>, c <span class="hljs-keyword">as</span> <span class="hljs-type">u8</span>);<br>                    &#125; <span class="hljs-keyword">else</span> &#123;<br>                        <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;&#123;:?&#125; (&#123;&#125;) \r&quot;</span>, c <span class="hljs-keyword">as</span> <span class="hljs-type">u8</span>, c);<br>                    &#125;<br>                &#125;<br>                Key::<span class="hljs-title function_ invoke__">Ctrl</span>(<span class="hljs-string">&#x27;q&#x27;</span>) =&gt; <span class="hljs-keyword">break</span>,<br>                _ =&gt; <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;&#123;:?&#125;\r&quot;</span>, key),<br>            &#125;,<br>            <span class="hljs-title function_ invoke__">Err</span>(err) =&gt; <span class="hljs-title function_ invoke__">die</span>(err),<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>我们已经从处理原始字节转变为处理按键输入。利用<code>termion</code>，无需手动检测<code>Ctrl</code>是否被按下，因为它能自动处理所有按键事件。例如，<code>Key::Char(c)</code>代表单独的字符按键，而<code>Key::Ctrl(c)</code>和<code>Key::Alt(c)</code>分别代表与<code>Ctrl</code>或<code>Alt</code>键同时按下的字符。我们的焦点主要在字符输入上，尤其是像<code>Ctrl-Q</code>这样的组合键。</p>
+<p>在使用<code>match</code>进行模式匹配时，会对按键进行区分处理：<code>Key::Char(c)</code>可以匹配任何字符，<code>Key::Ctrl('q')</code>则专门匹配<code>Ctrl-Q</code>组合。此前，我们将字节转换为字符以输出，而现在，<code>termion</code>提供了直接的字符输出，通过将字符转换为其对应的字节值来输出。</p>
+<p>我们在<code>match</code>表达式中添加了一个默认分支<code>_</code>，用于捕获所有其他未特别处理的情况。<code>match</code>必须包含所有可能性，因此<code>_</code>作为一个通配符，确保了所有未预见的输入都得到了处理。若有输入既不是普通字符也不是特定组合键，就将其原样输出。</p>
+<p>除此之外，为了简化代码，我们导入了<code>TermRead</code>特性，这样就可以使用<code>keys</code>方法来处理<code>stdin</code>输入，这比之前直接处理读取操作要简洁得多。</p>
+<h2 id="将代码划分到多个源文件">将代码划分到多个源文件</h2>
+<p>在<code>Rust</code>和许多其他编程语言中，<code>main</code>函数更多的是作为应用程序的启动入口，而不包含其他复杂逻辑。这是为了让代码更容易找到和维护。目前我们手头的代码层次较低，要理解整个代码，本质上它只是简单地将按下的键回显给用户，并在按下 <code>Ctrl-Q</code> 时退出。让我们通过创建多个文档来改进这段代码。</p>
+<figure class="highlight rust"><figcaption><span>src/editor.rs</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-keyword">pub</span> <span class="hljs-keyword">struct</span> <span class="hljs-title class_">Editor</span> &#123;&#125;<br></code></pre></td></tr></table></figure>
+<p>在<code>Rust</code>中，<code>struct</code>是变量和函数的集合，它们组合在一起构成了一个有意义的实体，在我们的例子中就是<code>editor</code>。关键字<code>pub</code>表明这个结构体可以从<code>editor.rs</code>文件外部访问。我们想要在<code>main</code>函数中使用它，因此我们使用了<code>pub</code>。这正展示了将代码分离的另一个好处：<strong>我们可以确保某些函数只在内部调用，同时将其他函数暴露给系统的其他部分。</strong></p>
+<p>现在，我们的编辑器需要一些功能。让我们为它提供一个<code>run()</code>函数：</p>
+<figure class="highlight rust"><figcaption><span>src/editor.rs</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-keyword">use</span> std::io::&#123;<span class="hljs-keyword">self</span>, stdout&#125;;<br><span class="hljs-keyword">use</span> termion::event::Key;<br><span class="hljs-keyword">use</span> termion::input::TermRead;<br><span class="hljs-keyword">use</span> termion::raw::IntoRawMode;<br><br><span class="hljs-keyword">pub</span> <span class="hljs-keyword">struct</span> <span class="hljs-title class_">Editor</span> &#123;&#125;<br><br><span class="hljs-keyword">impl</span> <span class="hljs-title class_">Editor</span> &#123;<br>    <span class="hljs-keyword">pub</span> <span class="hljs-keyword">fn</span> <span class="hljs-title function_">run</span>(&amp;<span class="hljs-keyword">self</span>) &#123;<br>        <span class="hljs-keyword">let</span> <span class="hljs-variable">_stdout</span> = <span class="hljs-title function_ invoke__">stdout</span>().<span class="hljs-title function_ invoke__">into_raw_mode</span>().<span class="hljs-title function_ invoke__">unwrap</span>();<br>    <br>        <span class="hljs-keyword">for</span> <span class="hljs-variable">key</span> <span class="hljs-keyword">in</span> io::<span class="hljs-title function_ invoke__">stdin</span>().<span class="hljs-title function_ invoke__">keys</span>()&#123;<br>            <span class="hljs-keyword">match</span> key&#123;<br>                <span class="hljs-title function_ invoke__">Ok</span>(key) =&gt; <span class="hljs-keyword">match</span> key&#123;<br>                    Key::<span class="hljs-title function_ invoke__">Char</span>(c) =&gt; &#123;<br>                        <span class="hljs-keyword">if</span> c.<span class="hljs-title function_ invoke__">is_control</span>() &#123;<br>                            <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;&#123;:?&#125;\r&quot;</span>, c <span class="hljs-keyword">as</span> <span class="hljs-type">u8</span>);<br>                        &#125; <span class="hljs-keyword">else</span> &#123;<br>                            <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;&#123;:?&#125; (&#123;&#125;) \r&quot;</span>, c <span class="hljs-keyword">as</span> <span class="hljs-type">u8</span>, c);<br>                        &#125;<br>                    &#125;<br>                    Key::<span class="hljs-title function_ invoke__">Ctrl</span>(<span class="hljs-string">&#x27;q&#x27;</span>) =&gt; <span class="hljs-keyword">break</span>,<br>                    _ =&gt; <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;&#123;:?&#125;\r&quot;</span>, key),<br>                &#125;,<br>                <span class="hljs-title function_ invoke__">Err</span>(err) =&gt; <span class="hljs-title function_ invoke__">die</span>(err),<br>            &#125;<br>        &#125;<br>    &#125;<br>&#125;<br><br><span class="hljs-keyword">fn</span> <span class="hljs-title function_">die</span>(e: std::io::Error)&#123;<br>    <span class="hljs-built_in">panic!</span>(<span class="hljs-string">&quot;&#123;&#125;&quot;</span>, e);<br>&#125;<br></code></pre></td></tr></table></figure>
+<p><code>run</code>函数接受一个名为 <code>&amp;self</code> 的参数，它将包含对被调用结构体的引用（<code>&amp;</code> 表明我们在处理一个引用）。这相当于在 <code>impl</code> 代码块外部有一个接受 <code>&amp;Editor</code> 作为第一个参数的函数。</p>
+<p>让我们通过重构我们的 <code>main.rs</code> ：</p>
+<figure class="highlight rust"><figcaption><span>src/main.rs</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-keyword">mod</span> editor;<br><br><span class="hljs-keyword">use</span> editor::Editor;<br><br><span class="hljs-keyword">fn</span> <span class="hljs-title function_">main</span>() &#123;<br>    <span class="hljs-keyword">let</span> <span class="hljs-variable">editor</span> = Editor &#123;&#125;;<br>    editor.<span class="hljs-title function_ invoke__">run</span>();<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>在<code>main</code>中，我们创建了一个 <code>Editor</code> 的新实例，并在其上调用 <code>run()</code> 方法。现在，让我们改进 <code>main</code> 中剩下的几行代码。结构体允许我们将变量组合在一起，但目前我们的结构体是空的——它不包含任何变量。一旦我们开始往结构体中添加内容，我们就需要在创建新的 <code>Editor</code> 实例时立即设置所有字段。这意味着每当在 <code>Editor</code> 中添加新条目时，我们都必须回到 <code>main</code> 函数中，并修改 <code>let editor = editor::Editor&#123;&#125;;</code> 这行代码来设置新的字段值。这样做并不理想，所以让我们重构一下这部分代码。</p>
+<figure class="highlight rust"><figcaption><span>src/editor.rs</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-comment">/*codes*/</span><br><br><span class="hljs-keyword">impl</span> <span class="hljs-title class_">Editor</span> &#123;<br>    <span class="hljs-comment">/*codes*/</span><br>    <br>    <span class="hljs-keyword">pub</span> <span class="hljs-keyword">fn</span> <span class="hljs-title function_">default</span>() <span class="hljs-punctuation">-&gt;</span> <span class="hljs-keyword">Self</span> &#123;<br>        Editor&#123;&#125;<br>    &#125;<br>&#125;<br><br><span class="hljs-comment">/*codes*/</span><br></code></pre></td></tr></table></figure>
+<figure class="highlight rust"><figcaption><span>src/main.rs</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-keyword">mod</span> editor;<br><br><span class="hljs-keyword">use</span> editor::Editor;<br><br><span class="hljs-keyword">fn</span> <span class="hljs-title function_">main</span>() &#123;<br>    <span class="hljs-keyword">let</span> <span class="hljs-variable">editor</span> = Editor::<span class="hljs-title function_ invoke__">default</span>();<br>    editor.<span class="hljs-title function_ invoke__">run</span>();<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>我们现在创建了一个名为 <code>default</code> 的新函数，用于构建一个 <code>Editor</code> 实例。值得注意的是，<code>default</code> 函数的最后一行没有包含 <code>return</code> 关键字，也没有以分号 <code>;</code> 结尾。<strong><code>Rust</code> 会将函数中最后一行的结果作为其输出，并且通过省略分号。</strong></p>
+<p>与 <code>run</code> 不同，<code>default</code> 函数不是在已有的 <code>Editor</code> 实例上调用的，这一点从函数签名中缺少 <code>&amp;self</code> 参数可以看出。<code>default</code> 是一个静态方法，通过使用 <code>::</code> 调用。</p>
+<p>本文链接:  <a href="https://zone.ivan-zhang.com.cn/p/156e55dd.html">https://zone.ivan-zhang.com.cn/p/156e55dd.html</a></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E8%AF%AD%E8%A8%80%E5%AD%A6%E4%B9%A0/" class="category-chain-item">语言学习</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Rust/" class="print-no-link">#Rust</a>
+      
+        <a href="/tags/TextEditor/" class="print-no-link">#TextEditor</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Rust学习-制作一个文本编辑器: Raw Input And Output</div>
+      <div>https://zone.ivan-zhang.com.cn/p/156e55dd</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ivan Zhang</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年11月15日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2023年11月16日</div>
+        </div>
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/p/8e0787d5" title="Rust学习-制作一个文本编辑器: Reading User Input">
+                        <span class="hidden-mobile">Rust学习-制作一个文本编辑器: Reading User Input</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'ZhangIvan1/ZhangIvan1.github.io');
+      s.setAttribute('issue-term', 'title');
+      
+      s.setAttribute('label', '✨💬✨ blog commit');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <div style="font-size: 0.85rem"> <span id="dateTime" /> <script src="/js/duration.js"></script> </div> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

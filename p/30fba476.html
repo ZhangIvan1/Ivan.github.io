@@ -1,0 +1,829 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="https://lsky.ivan-zhang.com.cn/i/2023/10/15/652b853431f84.jpeg">
+  <link rel="icon" href="https://lsky.ivan-zhang.com.cn/i/2023/10/15/652b853431f84.jpeg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ivan Zhang">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="热身分为三个部分，第一部分要求用telnet工具来发送一些简单的http请求，第二部分是写一个简单的webget应用模拟使用telnet是的操作，第三部分是完善一个ByteStream来实现更底层的socket写入读取等操作 第一部分 - Networking by hand A. Fetch a Web page 通过在浏览器中访问http:&#x2F;&#x2F;cs144.keithw.org&#x2F;hello，我们">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CS144计算机网络Lab0: Networking Warmup">
+<meta property="og:url" content="https://zone.ivan-zhang.com.cn/p/30fba476">
+<meta property="og:site_name" content="Ivan Zone">
+<meta property="og:description" content="热身分为三个部分，第一部分要求用telnet工具来发送一些简单的http请求，第二部分是写一个简单的webget应用模拟使用telnet是的操作，第三部分是完善一个ByteStream来实现更底层的socket写入读取等操作 第一部分 - Networking by hand A. Fetch a Web page 通过在浏览器中访问http:&#x2F;&#x2F;cs144.keithw.org&#x2F;hello，我们">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://lsky.ivan-zhang.com.cn/i/2023/10/24/6537b1575e576.png">
+<meta property="article:published_time" content="2023-10-14T09:36:47.000Z">
+<meta property="article:modified_time" content="2023-11-16T06:48:07.927Z">
+<meta property="article:author" content="Ivan Zhang">
+<meta property="article:tag" content="CS144">
+<meta property="article:tag" content="计算机网络">
+<meta property="article:tag" content="Lab">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://lsky.ivan-zhang.com.cn/i/2023/10/24/6537b1575e576.png">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+    <meta name="google-site-verification" content="QRmYEV3TU5Xl3W3amshmcmMfL2Vl-TKfcOA9E-TKwR0" />
+  
+  <title>CS144计算机网络Lab0: Networking Warmup - Ivan Zone</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_4287002_0rc6vut94t2.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/codeblock.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"zone.ivan-zhang.com.cn","root":"/","version":"1.9.5-a","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Ivan</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('https://lsky.ivan-zhang.com.cn/i/2023/10/15/652ad1ee7547f.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="CS144计算机网络Lab0: Networking Warmup"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-10-14 17:36" pubdate>
+          2023年10月14日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          5.2k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          44 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">CS144计算机网络Lab0: Networking Warmup</h1>
+            
+              <p class="note note-info">
+                
+                  
+                    本文最后更新于：2023年11月16日 下午
+                  
+                
+              </p>
+            
+            
+              <div class="markdown-body">
+                
+                <p>热身分为三个部分，第一部分要求用<code>telnet</code>工具来发送一些简单的http请求，第二部分是写一个简单的<code>webget</code>应用模拟使用<code>telnet</code>是的操作，第三部分是完善一个<code>ByteStream</code>来实现更底层的<code>socket</code>写入读取等操作</p>
+<h2 id="第一部分-Networking-by-hand">第一部分 - Networking by hand</h2>
+<h3 id="A-Fetch-a-Web-page">A. Fetch a Web page</h3>
+<p>通过在浏览器中访问<code>http://cs144.keithw.org/hello</code>，我们得到一条信息<code>Hello, CS144!</code>，现在让我们用<code>telnet</code>来实现这个过程：</p>
+<ul>
+<li>
+<p>首先需要通过<code>telnet</code>与<code>cs144.keithw.org</code>建立<code>reliable byte stream</code>，并告诉对方我们我们接下来的请求将使用<code>http</code>协议：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs shell">➜  ~ telnet cs144.keithw.org http<br>Trying 198.18.0.30...<br>Connected to cs144.keithw.org.<br>Escape character is &#x27;^]&#x27;.<br></code></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>​	现在我们就可以发送请求了</p>
+<ul>
+<li>
+<p>继续发送</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs http"><span class="hljs-keyword">GET</span> <span class="hljs-string">/hello</span> <span class="hljs-meta">HTTP/1.1</span><br><span class="hljs-attribute">Host</span><span class="hljs-punctuation">: </span>cs144.keithw.org<br><span class="hljs-attribute">Connection</span><span class="hljs-punctuation">: </span>close<br></code></pre></td></tr></table></figure>
+<p>值得注意的是，服务器需要在超时之前接收到请求，我刚开始的时候一行一行地输入，由于打字速度感人，就会由于超时而收到<code>Connection closed by foreign host.</code>。除此之外，再写好请求后需要多按两次回车告诉<code>telnet</code>发送该请求。</p>
+</li>
+<li>
+<p>最后我们得到了理想的返回响应</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs http"><span class="hljs-meta">HTTP/1.1</span> <span class="hljs-number">200</span> OK<br><span class="hljs-attribute">Date</span><span class="hljs-punctuation">: </span>Sun, 15 Oct 2023 04:38:14 GMT<br><span class="hljs-attribute">Server</span><span class="hljs-punctuation">: </span>Apache<br><span class="hljs-attribute">Last-Modified</span><span class="hljs-punctuation">: </span>Thu, 13 Dec 2018 15:45:29 GMT<br><span class="hljs-attribute">ETag</span><span class="hljs-punctuation">: </span>&quot;e-57ce93446cb64&quot;<br><span class="hljs-attribute">Accept-Ranges</span><span class="hljs-punctuation">: </span>bytes<br><span class="hljs-attribute">Content-Length</span><span class="hljs-punctuation">: </span>14<br><span class="hljs-attribute">Connection</span><span class="hljs-punctuation">: </span>close<br><span class="hljs-attribute">Content-Type</span><span class="hljs-punctuation">: </span>text/plain<br><br><span class="language-pgsql">Hello, CS144!</span><br><span class="language-pgsql"><span class="hljs-keyword">Connection</span> closed <span class="hljs-keyword">by</span> <span class="hljs-keyword">foreign</span> host.</span><br></code></pre></td></tr></table></figure>
+</li>
+</ul>
+<h4 id="Assignment">Assignment</h4>
+<p>最后有一个任务，要求从<code>http://cs144.keithw.org/lab0/sunetid</code>获取<code>secret code</code>，这个就非常的简单了</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs sh">➜  ~ telnet cs144.keithw.org http<br>Trying 198.18.0.30...<br>Connected to cs144.keithw.org.<br>Escape character is <span class="hljs-string">&#x27;^]&#x27;</span>.<br>GET /lab0/0001 HTTP/1.1<br>Host: cs144.keithw.org<br>Connection: close<br></code></pre></td></tr></table></figure>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs http"><span class="hljs-meta">HTTP/1.1</span> <span class="hljs-number">200</span> OK<br><span class="hljs-attribute">Date</span><span class="hljs-punctuation">: </span>Sun, 15 Oct 2023 04:47:40 GMT<br><span class="hljs-attribute">Server</span><span class="hljs-punctuation">: </span>Apache<br><span class="hljs-attribute">X-You-Said-Your-SunetID-Was</span><span class="hljs-punctuation">: </span>0001<br><span class="hljs-attribute">X-Your-Code-Is</span><span class="hljs-punctuation">: </span>427826<br><span class="hljs-attribute">Content-length</span><span class="hljs-punctuation">: </span>108<br><span class="hljs-attribute">Vary</span><span class="hljs-punctuation">: </span>Accept-Encoding<br><span class="hljs-attribute">Connection</span><span class="hljs-punctuation">: </span>close<br><span class="hljs-attribute">Content-Type</span><span class="hljs-punctuation">: </span>text/plain<br><br><span class="language-applescript">Hello! You told us <span class="hljs-keyword">that</span> your SUNet ID was <span class="hljs-string">&quot;0001&quot;</span>. Please see <span class="hljs-keyword">the</span> HTTP headers (<span class="hljs-keyword">above</span>) <span class="hljs-keyword">for</span> your secret code.</span><br><span class="language-applescript">Connection closed <span class="hljs-keyword">by</span> foreign host.</span><br></code></pre></td></tr></table></figure>
+<h3 id="B-Send-yourself-an-email"><s>B.Send yourself an email</s></h3>
+<h3 id="C-Listening-and-connecting">C. Listening and connecting</h3>
+<p>在上面我们使用<code>telnet</code>向服务器发送请求，现在我们将成为一个简单的服务器，接受外部的信息</p>
+<ul>
+<li>
+<p>使用<code>netcat</code>监听9090端口</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs sh">➜  ~ netcat -v -l -p 9090<br>Listening on 0.0.0.0 9090<br></code></pre></td></tr></table></figure>
+</li>
+<li>
+<p>在另一个终端中运行<code>telnet</code>，连接到本地的<code>9090</code>端口</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs sh">➜  ~ telnet localhost 9090<br>Trying 127.0.0.1...<br>Connected to localhost.<br>Escape character is <span class="hljs-string">&#x27;^]&#x27;</span>.<br></code></pre></td></tr></table></figure>
+</li>
+<li>
+<p>现在，我们可以在两个终端之间互相发送信息了</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs sh">➜  ~ netcat -v -l -p 9090<br>Listening on 0.0.0.0 9090<br>Connection received on localhost 60162<br>hello, this is Ivan, <span class="hljs-built_in">bye</span>~<br></code></pre></td></tr></table></figure>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs sh">➜  ~ telnet localhost 9090<br>Trying 127.0.0.1...<br>Connected to localhost.<br>Escape character is <span class="hljs-string">&#x27;^]&#x27;</span>.<br>hello, this is Ivan, <span class="hljs-built_in">bye</span>~<br></code></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="第二部分-Writing-a-network-program-using-an-OS-stream-socket">第二部分 - Writing a network program using an OS stream socket</h2>
+<p>这一部分需要通过系统内建的<code>stream socket</code>写一个简单的<code>webget</code>来实现之前<code>telnet</code>,具体来说，需要完善<code>apps/webget.cc</code>中的<code>get_URL</code>函数。我们可以参考<code>doctests/address_example_1.cc</code>和<code>doctests/socket_example_2.cc</code>，实际上就是初始化一个<code>TCPSocket</code>并通过目标<code>Address</code>建立连接，之后向服务求发送之前类似的请求</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-comment">// Your code here.</span><br><br>TCPSocket con;<br>con.<span class="hljs-built_in">connect</span>(<span class="hljs-built_in">Address</span>(host, <span class="hljs-string">&quot;http&quot;</span>));<br>con.<span class="hljs-built_in">write</span>(<span class="hljs-string">&quot;GET &quot;</span> + path + <span class="hljs-string">&quot; HTTP/1.1\r\n&quot;</span>);<br>con.<span class="hljs-built_in">write</span>(<span class="hljs-string">&quot;Host: &quot;</span> + host + <span class="hljs-string">&quot;\r\n&quot;</span>);<br>con.<span class="hljs-built_in">write</span>(<span class="hljs-string">&quot;Connection: close\r\n&quot;</span>);<br>con.<span class="hljs-built_in">write</span>(<span class="hljs-string">&quot;\r\n&quot;</span>);<br><br><span class="hljs-keyword">while</span>(!con.<span class="hljs-built_in">eof</span>())&#123;<br>    cout &lt;&lt; con.<span class="hljs-built_in">read</span>();<br>&#125;<br>con.<span class="hljs-built_in">close</span>();<br></code></pre></td></tr></table></figure>
+<p>在<code>Connection: close\r\n</code>之后，仍然需要写入一个<code>回车</code>告诉<code>socket</code>可以发送了，不然会一直等待直到超时。</p>
+<p>测试一下</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs sh">➜  build git:(main) ✗ make check_webget<br>[100%] Testing webget...<br>Test project /root/CS144Learn/build<br>    Start 31: t_webget<br>1/1 Test <span class="hljs-comment">#31: t_webget .........................   Passed    1.30 sec</span><br><br>100% tests passed, 0 tests failed out of 1<br><br>Total Test time (real) =   1.32 sec<br>[100%] Built target check_webget<br></code></pre></td></tr></table></figure>
+<h2 id="第三部分-An-in-memory-reliable-byte-stream">第三部分 - An in-memory reliable byte stream</h2>
+<p>这一部分要求我们根据<code>pdf</code>中<code>writer</code>和<code>reader</code>的接口来完善<code>libsponge/byte stream.hh</code>和<code>libsponge/byte stream.cc</code>，并能处理比<code>buffer</code>容量要长的多的字节流。</p>
+<p><code>byte stream.hh</code></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">class</span> <span class="hljs-title class_">ByteStream</span> &#123;<br>  <span class="hljs-keyword">private</span>:<br>    <span class="hljs-comment">// Your code here -- add private members as necessary.</span><br>    std::string string_buffer;<br>    <span class="hljs-type">size_t</span> _buffer_size;<br>    <span class="hljs-type">size_t</span> _bytes_written;<br>    <span class="hljs-type">size_t</span> _bytes_read;<br><span class="hljs-comment">//    bool _buffer_empty = false;</span><br>    <span class="hljs-type">bool</span> _is_input_ended = <span class="hljs-literal">false</span>;<br>    <br>    <span class="hljs-comment">/*code*/</span><br>&#125;<br></code></pre></td></tr></table></figure>
+<p><code>byte stream.cc</code></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><code class="hljs c++">ByteStream::<span class="hljs-built_in">ByteStream</span>(<span class="hljs-type">const</span> <span class="hljs-type">size_t</span> capacity) : <span class="hljs-built_in">string_buffer</span>(<span class="hljs-string">&quot;&quot;</span>), _buffer_size(capacity), _bytes_written(<span class="hljs-number">0</span>), _bytes_read(<span class="hljs-number">0</span>) &#123;&#125;<br><br><span class="hljs-function"><span class="hljs-type">size_t</span> <span class="hljs-title">ByteStream::write</span><span class="hljs-params">(<span class="hljs-type">const</span> string &amp;data)</span> </span>&#123;<br><span class="hljs-comment">//    DUMMY_CODE(data);</span><br>    <span class="hljs-type">size_t</span> write_cnt = <span class="hljs-built_in">min</span>(<span class="hljs-built_in">remaining_capacity</span>(), data.<span class="hljs-built_in">length</span>());<br>    string_buffer += std::<span class="hljs-built_in">move</span>(data.<span class="hljs-built_in">substr</span>(<span class="hljs-number">0</span>,write_cnt));<br>    _bytes_written += write_cnt;<br><br>    <span class="hljs-keyword">return</span> write_cnt;<br>&#125;<br><br><span class="hljs-comment">//! \param[in] len bytes will be copied from the output side of the buffer</span><br><span class="hljs-function">string <span class="hljs-title">ByteStream::peek_output</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">size_t</span> len)</span> <span class="hljs-type">const</span> </span>&#123;<br><span class="hljs-comment">//    DUMMY_CODE(len);</span><br>    <span class="hljs-keyword">return</span> string_buffer.<span class="hljs-built_in">substr</span>(<span class="hljs-number">0</span>,len);<br>&#125;<br><br><span class="hljs-comment">//! \param[in] len bytes will be removed from the output side of the buffer</span><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">ByteStream::pop_output</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">size_t</span> len)</span> </span>&#123;<br><span class="hljs-comment">//    DUMMY_CODE(len);</span><br>    string_buffer.<span class="hljs-built_in">erase</span>(<span class="hljs-number">0</span>,len);<br>    _bytes_read+=len;<br>&#125;<br><br><span class="hljs-comment">//! Read (i.e., copy and then pop) the next &quot;len&quot; bytes of the stream</span><br><span class="hljs-comment">//! \param[in] len bytes will be popped and returned</span><br><span class="hljs-comment">//! \returns a string</span><br><span class="hljs-function">std::string <span class="hljs-title">ByteStream::read</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">size_t</span> len)</span> </span>&#123;<br>    <span class="hljs-comment">//    DUMMY_CODE(len);</span><br>    std::string copied_str = <span class="hljs-built_in">peek_output</span>(len);<br>    <span class="hljs-built_in">pop_output</span>(len);<br><br>    <span class="hljs-keyword">return</span> copied_str;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">ByteStream::end_input</span><span class="hljs-params">()</span> </span>&#123; _is_input_ended = <span class="hljs-literal">true</span>; &#125;<br><br><span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">ByteStream::input_ended</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> _is_input_ended; &#125;<br><br><span class="hljs-function"><span class="hljs-type">size_t</span> <span class="hljs-title">ByteStream::buffer_size</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> string_buffer.<span class="hljs-built_in">length</span>(); &#125;<br><br><span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">ByteStream::buffer_empty</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> string_buffer.<span class="hljs-built_in">empty</span>(); &#125;<br><br><span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">ByteStream::eof</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> _is_input_ended &amp;&amp; <span class="hljs-built_in">buffer_empty</span>(); &#125;<br><br><span class="hljs-function"><span class="hljs-type">size_t</span> <span class="hljs-title">ByteStream::bytes_written</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> _bytes_written; &#125;<br><br><span class="hljs-function"><span class="hljs-type">size_t</span> <span class="hljs-title">ByteStream::bytes_read</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> _bytes_read; &#125;<br><br><span class="hljs-function"><span class="hljs-type">size_t</span> <span class="hljs-title">ByteStream::remaining_capacity</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> _buffer_size - <span class="hljs-built_in">buffer_size</span>(); &#125;<br></code></pre></td></tr></table></figure>
+<p>在一开始做这个实验的时候，完全不知道需要干什么，之前学的C++还有面向对象的知识都忘了不少。实际上只需要按照每个模块的功能一步步写+<code>debug</code>就好了。</p>
+<p>在测试的时候经常会出现<code>The ByteStream should have had bytes_written equal to 0 but instead it was 1</code>这样的错误，后面发现是我在定义<code>string_buffer</code>的时候把它初始化为了<code>&quot; &quot;</code>，而正常应该是为<code>空</code>。</p>
+<p>本文链接:  <a href="https://zone.ivan-zhang.com.cn/p/30fba476.html">https://zone.ivan-zhang.com.cn/p/30fba476.html</a></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" class="category-chain-item">计算机网络</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/CS144/" class="print-no-link">#CS144</a>
+      
+        <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" class="print-no-link">#计算机网络</a>
+      
+        <a href="/tags/Lab/" class="print-no-link">#Lab</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>CS144计算机网络Lab0: Networking Warmup</div>
+      <div>https://zone.ivan-zhang.com.cn/p/30fba476</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ivan Zhang</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年10月14日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2023年11月16日</div>
+        </div>
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/p/8eb2211f" title="CS144计算机网络Lab1: Stitching Substrings into a Byte Stream">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">CS144计算机网络Lab1: Stitching Substrings into a Byte Stream</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'ZhangIvan1/ZhangIvan1.github.io');
+      s.setAttribute('issue-term', 'title');
+      
+      s.setAttribute('label', '✨💬✨ blog commit');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <div style="font-size: 0.85rem"> <span id="dateTime" /> <script src="/js/duration.js"></script> </div> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

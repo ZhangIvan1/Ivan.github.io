@@ -1,0 +1,843 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="https://lsky.ivan-zhang.com.cn/i/2023/10/15/652b853431f84.jpeg">
+  <link rel="icon" href="https://lsky.ivan-zhang.com.cn/i/2023/10/15/652b853431f84.jpeg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Ivan Zhang">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="The arrangement of modules and dataflow in TCP implementation.  &#96;Lab1&#96;要求实现一个&#96;StreamReassembler&#96;，也就是接收端的&#96;滑动窗口&#96;，包含以下几个功能：  将零散的字节流片段拼接成顺序正确的字节流； 忽略重复传输的数据包； 拒绝过早传输的数据包； 将排序好的字节流传递给上层的ByteStream。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CS144计算机网络Lab1: Stitching Substrings into a Byte Stream">
+<meta property="og:url" content="https://zone.ivan-zhang.com.cn/p/8eb2211f">
+<meta property="og:site_name" content="Ivan Zone">
+<meta property="og:description" content="The arrangement of modules and dataflow in TCP implementation.  &#96;Lab1&#96;要求实现一个&#96;StreamReassembler&#96;，也就是接收端的&#96;滑动窗口&#96;，包含以下几个功能：  将零散的字节流片段拼接成顺序正确的字节流； 忽略重复传输的数据包； 拒绝过早传输的数据包； 将排序好的字节流传递给上层的ByteStream。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://lsky.ivan-zhang.com.cn/i/2023/10/24/6537b1575e576.png">
+<meta property="article:published_time" content="2023-10-15T08:28:19.000Z">
+<meta property="article:modified_time" content="2023-11-16T06:48:07.928Z">
+<meta property="article:author" content="Ivan Zhang">
+<meta property="article:tag" content="CS144">
+<meta property="article:tag" content="计算机网络">
+<meta property="article:tag" content="Lab">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://lsky.ivan-zhang.com.cn/i/2023/10/24/6537b1575e576.png">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+    <meta name="google-site-verification" content="QRmYEV3TU5Xl3W3amshmcmMfL2Vl-TKfcOA9E-TKwR0" />
+  
+  <title>CS144计算机网络Lab1: Stitching Substrings into a Byte Stream - Ivan Zone</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_4287002_0rc6vut94t2.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/codeblock.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"zone.ivan-zhang.com.cn","root":"/","version":"1.9.5-a","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Ivan</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('https://lsky.ivan-zhang.com.cn/i/2023/10/15/652ad1ee7547f.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="CS144计算机网络Lab1: Stitching Substrings into a Byte Stream"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-10-15 16:28" pubdate>
+          2023年10月15日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          4.4k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          37 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">CS144计算机网络Lab1: Stitching Substrings into a Byte Stream</h1>
+            
+              <p class="note note-info">
+                
+                  
+                    本文最后更新于：2023年11月16日 下午
+                  
+                
+              </p>
+            
+            
+              <div class="markdown-body">
+                
+                <center>
+  <img src="http://lsky.ivan-zhang.com.cn/i/2023/10/15/652c095ff0876.png" srcset="/img/loading.gif" lazyload alt="CS144TCPSocket" style="zoom:25%;" /><br>
+  <font color="DimGray" size="3">The arrangement of modules and dataflow in TCP implementation.</font>
+</center>
+`Lab1`要求实现一个`StreamReassembler`，也就是接收端的`滑动窗口`，包含以下几个功能：
+<ul>
+<li>将零散的字节流片段拼接成顺序正确的字节流；</li>
+<li>忽略重复传输的数据包；</li>
+<li>拒绝过早传输的数据包；</li>
+<li>将排序好的字节流传递给上层的<code>ByteStream</code>。</li>
+</ul>
+<h2 id="A-Putting-substrings-in-sequence">A. Putting substrings in sequence</h2>
+<p>在pdf中，作者给出了一个<code>StreamReassembler</code>的简单示意图，不过比较抽象</p>
+<center>
+  <img src="http://lsky.ivan-zhang.com.cn/i/2023/10/16/652ceff38d891.png" srcset="/img/loading.gif" lazyload alt="StreamReassembler" style="zoom:65%;" /><br>
+  <font color="DimGray" size="3">StreamReassembler.</font>
+</center>
+<h3 id="首次尝试">首次尝试</h3>
+<p>具体来说，对于外部输入随机排列的<code>substring</code>，使用滑动窗口处理陆续到达的<code>substring</code>并将它们全部储存在<code>buffer_string</code>中，其中滑动窗口是由<code>_reassembled_pt</code>和<code>_end_pt</code>两个指针组成，并保证<code>_end_pt - _reassembled_pt &lt;= _capacity</code>；同时维护一个<code>buffer_check</code>用来储存<code>buffer_string</code>中每个字节的占用情况。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs C++"><span class="hljs-keyword">class</span> <span class="hljs-title class_">StreamReassembler</span> &#123;<br>  <span class="hljs-keyword">private</span>:<br>    <span class="hljs-comment">// Your code here -- add private members as necessary.</span><br>    std::string buffer_string;<br>    std::string buffer_check;<br>    <span class="hljs-type">size_t</span> _reassembled_pt;<br>    <span class="hljs-type">size_t</span> _end_pt;<br>    <br>    <span class="hljs-comment">/*code*/</span><br>&#125;<br></code></pre></td></tr></table></figure>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs C++">StreamReassembler::<span class="hljs-built_in">StreamReassembler</span>(<span class="hljs-type">const</span> <span class="hljs-type">size_t</span> capacity) : <span class="hljs-built_in">buffer_string</span>(<span class="hljs-string">&quot;&quot;</span>), <span class="hljs-built_in">buffer_check</span>(<span class="hljs-string">&quot;&quot;</span>), _reassembled_pt(<span class="hljs-number">0</span>), _end_pt(<span class="hljs-number">-1</span>), _output(capacity), _capacity(capacity) &#123;&#125;<br></code></pre></td></tr></table></figure>
+<p>对于<code>push_substring()</code>，<code>workflow</code>如下：</p>
+<center>
+  <img src="http://lsky.ivan-zhang.com.cn/i/2023/10/16/652d1588dde32.jpeg" srcset="/img/loading.gif" lazyload alt="StreamReassembler" style="zoom:30%;" /><br>
+  <font color="DimGray" size="3">StreamReassembler.</font>
+</center>
+<ul>
+<li>计算插入<code>data</code>后buffer_string的长度：<code>extended_length = index + data.length()</code>；</li>
+<li>检查<code>extended_length</code>是否超出<code>capacity</code>，若超出则直接<code>return</code>；</li>
+<li>检查<code>eof</code>是否为<code>true</code>，将<code>_end_pt</code>设置成<code>extended_length</code>；</li>
+<li>将<code>buffer_string</code>和<code>buffer_check</code>的长度扩展到<code>extended_length</code>，并写入<code>data</code>同时将对应位置的<code>check</code>置为<code>1</code>；</li>
+<li>如果<code>_reassembled_pt</code>位置上的比特非空，就写入到<code>ByteStream</code>，并右移<code>_reassembled_pt</code>直到遇到空位或<code>_reassembled_pt == _end_pt</code>；</li>
+<li>当<code>_reassembled_pt == _end_pt</code>时，结束<code>ByteStream</code>输入。</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs C++"><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">StreamReassembler::push_substring</span><span class="hljs-params">(<span class="hljs-type">const</span> string &amp;data, <span class="hljs-type">const</span> <span class="hljs-type">size_t</span> index, <span class="hljs-type">const</span> <span class="hljs-type">bool</span> eof)</span> </span>&#123;<br><span class="hljs-comment">//    DUMMY_CODE(data, index, eof);</span><br><br>    <span class="hljs-type">size_t</span> extended_length = index + data.<span class="hljs-built_in">length</span>();<br><br>    <span class="hljs-keyword">if</span> (extended_length &gt; _capacity)<br>        <span class="hljs-keyword">return</span>;<br><br>    <span class="hljs-keyword">if</span> (eof)<br>        _end_pt = extended_length;<br><br>    buffer_string.<span class="hljs-built_in">resize</span>(extended_length),<br>    buffer_check.<span class="hljs-built_in">resize</span>(extended_length),<br>    buffer_string.<span class="hljs-built_in">replace</span>(index,data.<span class="hljs-built_in">length</span>(),data);<br>    buffer_check.<span class="hljs-built_in">replace</span>(index,data.<span class="hljs-built_in">length</span>(),data.<span class="hljs-built_in">length</span>(),<span class="hljs-string">&#x27;1&#x27;</span>);<br><br>    <span class="hljs-keyword">while</span>(buffer_check[_reassembled_pt] &amp;&amp; _output.<span class="hljs-built_in">remaining_capacity</span>())&#123;<br>        _output.<span class="hljs-built_in">write</span>(<span class="hljs-built_in">to_string</span>(buffer_string[_reassembled_pt]));<br>        _reassembled_pt++;<br>    &#125;<br><br>    <span class="hljs-keyword">if</span> (_reassembled_pt == _end_pt)<br>        _output.<span class="hljs-built_in">end_input</span>();<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>对于<code>unassembled_bytes()</code>函数，我们需要查看滑动窗口里未被连续填充的区间中填充byte的数量，也就是当<code>_reassembled_pt</code>处为空时，在其之后的<code>substring</code>数量，这里直接遍历一边就好。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs C++"><span class="hljs-function"><span class="hljs-type">size_t</span> <span class="hljs-title">StreamReassembler::unassembled_bytes</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123;<br>    <span class="hljs-type">size_t</span> bytes_cnt = <span class="hljs-number">0</span>;<br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">size_t</span> i = _reassembled_pt; i != buffer_check.<span class="hljs-built_in">length</span>(); i++)<br>        <span class="hljs-keyword">if</span>(buffer_check[i] == <span class="hljs-string">&#x27;1&#x27;</span>) bytes_cnt++;<br>    <span class="hljs-keyword">return</span> bytes_cnt;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>最后，判断<code>StreamReassembler</code>是否为空</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs C++"><span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">StreamReassembler::empty</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> !<span class="hljs-built_in">unassembled_bytes</span>(); &#125;<br></code></pre></td></tr></table></figure>
+<p>然而，这个方案不能通过测试。</p>
+<h3 id="进一步改进">进一步改进</h3>
+<p>经过复盘发现了一些问题：</p>
+<ol>
+<li>当<code>extended_length</code>超过<code>_capacity</code>时就直接全部抛弃了，没有考虑部分输入的情况，正确的逻辑应该是仅抛弃无法写入的<code>unacceptable</code>字节；</li>
+<li><code>eof</code>也没有考虑<code>unacceptable</code>字节的问题，需要对本次<code>data</code>是否能完整写入进行判定；</li>
+<li>在写入<code>ByteStream</code>时，逐个进行的，并且进行了类型转换。</li>
+<li>除此之外，在一开始进行分析的时候对<code>_reassembled_pt</code>和<code>_end_pt</code>的说明是<code>_end_pt - _reassembled_pt &lt;= _capacity</code>，忽略了<code>_end_pt</code>与<code>eof</code>的联系。</li>
+</ol>
+<p>经过修改新<code>workflow</code>如下：</p>
+<ul>
+<li>计算插入<code>data</code>后<code>buffer_string</code>的长度：<code>extended_length = index + data.length()</code>  ----&gt;<strong>插入长度</strong>；</li>
+<li>计算符合<code>_capacity</code>要求理论最大长度：<code>max_expended_length = _reassembled_pt + _capacity</code>  ----&gt;<strong>最大长度</strong>；</li>
+<li>检查<code>index</code>是否超出<code>capacity</code>，若超出则直接<code>return</code>；</li>
+<li>检查<code>eof</code>是否为<code>true</code>，且如果本次的<code>data</code>能完全插入则令<code>_end_pt = expended_length</code>；</li>
+<li>调整<code>buffer</code>并插入<code>data</code>
+<ul>
+<li>如果<strong>插入长度</strong>大于当前<code>buffer_string</code>的长度，则将<code>buffer_string</code>和<code>buffer_check</code>扩展到<strong>插入长度</strong>；</li>
+<li>写入<code>data</code>同时将对应位置的<code>check</code>置为<code>1</code>；</li>
+<li>如果插入后当前<code>buffer_string</code>的长度大于<strong>最大长度</strong>，则将<code>buffer_string</code>和<code>buffer_check</code>缩短到<strong>最大长度</strong>，抛弃掉<code>unacceptable</code>字节。</li>
+</ul>
+</li>
+<li>如果<code>_reassembled_pt</code>位置上的比特非空，就写入到<code>ByteStream</code>，并右移<code>_reassembled_pt</code>直到遇到空位或<code>_output</code>已满；</li>
+<li>当<code>_reassembled_pt == _end_pt</code>时，结束<code>ByteStream</code>输入。</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><code class="hljs C++"><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">StreamReassembler::push_substring</span><span class="hljs-params">(<span class="hljs-type">const</span> string &amp;data, <span class="hljs-type">const</span> <span class="hljs-type">size_t</span> index, <span class="hljs-type">const</span> <span class="hljs-type">bool</span> eof)</span> </span>&#123;<br><span class="hljs-comment">//    DUMMY_CODE(data, index, eof);</span><br>    <span class="hljs-type">size_t</span> expended_length = index + data.<span class="hljs-built_in">length</span>();<br>    <span class="hljs-type">size_t</span> max_expended_length = _reassembled_pt + _capacity;<br><br>    <span class="hljs-keyword">if</span> (index &gt; max_expended_length)<br>        <span class="hljs-keyword">return</span>;<br><br>    <span class="hljs-keyword">if</span> (eof &amp;&amp; expended_length &lt;= max_expended_length)<br>        _end_pt = expended_length;<br><br>    <span class="hljs-keyword">if</span> (expended_length &gt; buffer_string.<span class="hljs-built_in">length</span>()) &#123;<br>        buffer_string.<span class="hljs-built_in">resize</span>(expended_length);<br>        buffer_check.<span class="hljs-built_in">resize</span>(expended_length);<br>    &#125;<br><br>        buffer_string.<span class="hljs-built_in">replace</span>(index, data.<span class="hljs-built_in">length</span>(), data);<br>        buffer_check.<span class="hljs-built_in">replace</span>(index, data.<span class="hljs-built_in">length</span>(), data.<span class="hljs-built_in">length</span>(), <span class="hljs-string">&#x27;1&#x27;</span>);<br><br>    <span class="hljs-keyword">if</span> (buffer_string.<span class="hljs-built_in">length</span>() &gt; max_expended_length)&#123;<br>        buffer_string.<span class="hljs-built_in">resize</span>(max_expended_length);<br>        buffer_check.<span class="hljs-built_in">resize</span>(max_expended_length);<br>    &#125;<br><br>    <span class="hljs-keyword">if</span> (buffer_check[_reassembled_pt] &amp;&amp; _output.<span class="hljs-built_in">remaining_capacity</span>())&#123;<br>        <span class="hljs-type">size_t</span> write_len = <span class="hljs-number">0</span>;<br>        <span class="hljs-keyword">while</span>(buffer_check[_reassembled_pt + write_len] &amp;&amp; _output.<span class="hljs-built_in">remaining_capacity</span>() - write_len) write_len++;<br>        _output.<span class="hljs-built_in">write</span>(buffer_string.<span class="hljs-built_in">substr</span>(_reassembled_pt,write_len));<br>        _reassembled_pt += write_len;<br>    &#125;<br><br>    <span class="hljs-keyword">if</span> (_reassembled_pt == _end_pt)<br>        _output.<span class="hljs-built_in">end_input</span>();<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>通过了<code>test</code>。</p>
+<p>本文链接:  <a href="https://zone.ivan-zhang.com.cn/p/8eb2211f.html">https://zone.ivan-zhang.com.cn/p/8eb2211f.html</a></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" class="category-chain-item">计算机网络</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/CS144/" class="print-no-link">#CS144</a>
+      
+        <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" class="print-no-link">#计算机网络</a>
+      
+        <a href="/tags/Lab/" class="print-no-link">#Lab</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>CS144计算机网络Lab1: Stitching Substrings into a Byte Stream</div>
+      <div>https://zone.ivan-zhang.com.cn/p/8eb2211f</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Ivan Zhang</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年10月15日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2023年11月16日</div>
+        </div>
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/p/b9f66227" title="CS144计算机网络Lab2: The TCP Receiver">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">CS144计算机网络Lab2: The TCP Receiver</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/p/30fba476" title="CS144计算机网络Lab0: Networking Warmup">
+                        <span class="hidden-mobile">CS144计算机网络Lab0: Networking Warmup</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'ZhangIvan1/ZhangIvan1.github.io');
+      s.setAttribute('issue-term', 'title');
+      
+      s.setAttribute('label', '✨💬✨ blog commit');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <div style="font-size: 0.85rem"> <span id="dateTime" /> <script src="/js/duration.js"></script> </div> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
