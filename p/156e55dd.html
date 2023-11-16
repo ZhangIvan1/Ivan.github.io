@@ -27,7 +27,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://lsky.ivan-zhang.com.cn/i/2023/11/11/654f341780bd6.png">
 <meta property="article:published_time" content="2023-11-14T22:52:50.000Z">
-<meta property="article:modified_time" content="2023-11-16T14:35:56.458Z">
+<meta property="article:modified_time" content="2023-11-16T14:38:31.563Z">
 <meta property="article:author" content="Ivan Zhang">
 <meta property="article:tag" content="Rust">
 <meta property="article:tag" content="TextEditor">
@@ -272,7 +272,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          4.4k 字
+          4.6k 字
         
       </span>
     
@@ -283,7 +283,7 @@
         
         
         
-          37 分钟
+          39 分钟
         
       </span>
     
@@ -361,6 +361,7 @@
 <p>在<code>run</code>中，执行<code>self.process_keypress()</code>并检查结果是否匹配<code>Err</code>。如果是，就将错误解包并传递给<code>die</code>函数，如果不是，则不做任何事情。</p>
 <p>我们可以通过查看<code>process_keypress</code>函数的声明来更清晰地了解这一点：</p>
 <figure class="highlight rust"><figcaption><span>process_keypress()</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-keyword">fn</span> <span class="hljs-title function_">process_keypress</span>(&amp;<span class="hljs-keyword">self</span>) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-type">Result</span>&lt;(), std::io::Error&gt;<br></code></pre></td></tr></table></figure>
+<p><code>-&gt;</code>后面的部分表明：这个函数返回一个<code>Result</code>类型。<code>&lt;&gt;</code>里的内容告诉我们<code>Ok</code>和<code>Err</code>分别包含什么内容：<code>Ok</code>会包裹一个<code>()</code>，意味着<strong>无内容</strong>，而<code>Err</code>会包裹一个<code>std::io::Error</code>。<code>process_keypress()</code>函数等待按键输入，然后处理它。随后，它会将各种<code>Ctrl</code>组合键和其他特殊键映射到不同的编辑器功能，将任何字母数字和其他可打印键的字符插入到正在编辑的文本中。这就是为什么在这里使用<code>match</code>而不是<code>if let</code>。</p>
 <p>本文链接:  <a href="https://zone.ivan-zhang.com.cn/p/156e55dd.html">https://zone.ivan-zhang.com.cn/p/156e55dd.html</a></p>
 
                 
