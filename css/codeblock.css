@@ -1,23 +1,17 @@
-pre code {
-  background-color: #2d2d2d; /* Dark background */
-  color: #fff; /* White text color */
-  border: none; /* No border */
-  border-radius: 4px; /* Rounded corners */
-  padding: 16px; /* Padding inside the code block */
-  overflow-x: auto; /* Horizontal scroll if the content is wide */
-  font-family: 'Your-Preferred-Monospace-Font', monospace; /* Font family for code */
-  font-size: 0.9em; /* Adjust the font size as needed */
+.highlight {
+  background: #21252b;
+  border-radius: 5px;
+  box-shadow: 0 10px 30px 0 rgba(0,0,0,0.4);
+  padding-top: 30px;
 }
-/* Optional: If you want to style the line numbers separately */
-pre .line-numbers-rows {
-  color: #858585; /* Gray color for line numbers */
-  background-color: #2d2d2d; /* Same as code block background */
-  border-right: 1px solid #3d3d3d; /* Line separating line numbers and code */
-}
-/* Optional: Styling for different tokens, such as keywords, strings, etc. */
-.token.keyword {
-  color: #cc99cd; /* Light purple */
-}
-.token.string {
-  color: #7ec699; /* Light green */
+.highlight figcaption {
+  margin-top: -25px;
+  position: absolute;
+  display: block !important;
+  background: #21252b;
+  padding-left: 20px;
+  color: #fff;
+  font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
+  font-size: 0.75rem;
+  font-weight: bold;
 }
