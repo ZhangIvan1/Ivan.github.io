@@ -27,7 +27,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://lsky.ivan-zhang.com.cn/i/2023/11/11/654f341780bd6.png">
 <meta property="article:published_time" content="2023-11-14T22:52:50.000Z">
-<meta property="article:modified_time" content="2023-11-17T07:12:14.061Z">
+<meta property="article:modified_time" content="2023-11-18T05:17:59.512Z">
 <meta property="article:author" content="Ivan Zhang">
 <meta property="article:tag" content="Rust">
 <meta property="article:tag" content="TextEditor">
@@ -325,7 +325,7 @@
               <p class="note note-info">
                 
                   
-                    本文最后更新于：2023年11月17日 下午
+                    本文最后更新于：2023年11月18日 下午
                   
                 
               </p>
@@ -376,7 +376,7 @@
 <p>此外，我们还做了一些调整。在<code>process_keypress()</code>函数中，我们对<code>self</code>进行了修改，因此需要将参数从<code>&amp;self</code>改为<code>&amp;mut self</code>，以便能够修改引用。<code>Rust</code>对可变引用有严格的规则。</p>
 <p>同样地，由于<code>run</code>函数内部需要调用<code>process_keypress()</code>，我们也调整了它的函数声明。</p>
 <p>最后，在<code>main</code>函数中，<code>let editor = ...</code>表示<code>editor</code>是不可变的，我们不能在其上执行可能会修改它的<code>run</code>。为此我们将其改为<code>let mut editor</code>。现在我们不再需要<code>editor</code>变量，直接在<code>default()</code>的返回值上调用<code>run()</code>。</p>
-<script src="//gist.github.com/4b63c8f0b098608979d82a7f57dd87e6.js"></script>
+<h2 id="清空屏幕">清空屏幕</h2>
 <p>本文链接:  <a href="https://zone.ivan-zhang.com.cn/p/156e55dd.html">https://zone.ivan-zhang.com.cn/p/156e55dd.html</a></p>
 
                 
@@ -444,7 +444,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2023年11月17日</div>
+          <div>2023年11月18日</div>
         </div>
       
       
