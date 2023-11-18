@@ -27,7 +27,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://lsky.ivan-zhang.com.cn/i/2023/11/11/654f341780bd6.png">
 <meta property="article:published_time" content="2023-11-14T22:52:50.000Z">
-<meta property="article:modified_time" content="2023-11-18T08:30:05.508Z">
+<meta property="article:modified_time" content="2023-11-18T17:16:20.259Z">
 <meta property="article:author" content="Ivan Zhang">
 <meta property="article:tag" content="Rust">
 <meta property="article:tag" content="TextEditor">
@@ -272,7 +272,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          8.8k 字
+          9.2k 字
         
       </span>
     
@@ -283,7 +283,7 @@
         
         
         
-          74 分钟
+          78 分钟
         
       </span>
     
@@ -325,7 +325,7 @@
               <p class="note note-info">
                 
                   
-                    本文最后更新于：2023年11月18日 下午
+                    本文最后更新于：2023年11月19日 凌晨
                   
                 
               </p>
@@ -384,6 +384,9 @@
 <p>我们正在向终端写入一个转义序列。转义序列总是以转义字符（如<code>Esc</code>键产生的27）开始，后跟一个<code>[</code>字符。转义序列指示终端执行各种文本格式化任务，如改变文本颜色、移动光标或清除屏幕的部分内容。</p>
 <p>我们使用<code>J</code>命令<code>(Erase In Display)</code>来清除屏幕。转义序列命令通常会带参数，参数位于命令之前。在这里参数是<code>2</code>，表示清除整个屏幕。<code>\x1b[1J</code>会清除光标处到屏幕顶部的内容，而<code>\x1b[0J</code>会清除光标处到屏幕末尾的内容。<code>J</code>命令默认的参数就是<code>0</code>，所以只写<code>\x1b[J</code>也能从光标处清屏到末尾。</p>
 <p>向终端写入内容后，我们会调用<code>flush()</code>，它会强制<code>stdout</code>输出它所缓存的所有内容（有时它可能会缓存某些值而不是直接打印出来）。我们也返回了<code>flush()</code>的结果，与前面类似，要么是<code>Ok</code>表示没有值（即一切正常），要么是<code>Err</code>包装了一个错误（即刷新失败）。这一点很重要：如果我们在<code>flush()</code>之后添加了;`，我们就不会返回它的结果。</p>
+<p>使用<code>termion</code>库让我们无需直接向终端写入转义序列，因此我们可以按照如下方式修改代码：</p>
+<figure class="highlight diff"><figcaption><span>src/editor.rs</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs diff"><span class="hljs-meta">@@ -29,7 +29,7 @@</span> impl Editor &#123;<br>     &#125;<br> <br>     fn refresh_screen(&amp;self) -&gt; Result&lt;(), std::io::Error&gt; &#123;<br><span class="hljs-deletion">-        print!(&quot;\x1b[2J&quot;);</span><br><span class="hljs-addition">+        print!(&quot;&#123;&#125;&quot;,termion::clear::All);</span><br>         io::stdout().flush()<br>     &#125;<br></code></pre></td></tr></table></figure>
+<p>现在，由于我们现在每次运行程序都会清屏，我们可能会错过编译器提供的有价值的提示。可以通过单独运行<code>cargo build</code>来查看这些警告。但请记住，<strong>如果你的代码没有变化，<code>Rust</code>不会重新编译你的代码</strong>，所以在执行<code>cargo run</code>之后立即运行<code>cargo build</code>并不会显示相同的警告。你可以先运行<code>cargo clean</code>然后再运行<code>cargo build</code>来重新编译整个项目，并查看所有的警告。</p>
 <p>本文链接:  <a href="https://zone.ivan-zhang.com.cn/p/156e55dd.html">https://zone.ivan-zhang.com.cn/p/156e55dd.html</a></p>
 
                 
@@ -451,7 +454,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2023年11月18日</div>
+          <div>2023年11月19日</div>
         </div>
       
       
