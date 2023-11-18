@@ -27,7 +27,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://lsky.ivan-zhang.com.cn/i/2023/11/11/654f341780bd6.png">
 <meta property="article:published_time" content="2023-11-14T22:52:50.000Z">
-<meta property="article:modified_time" content="2023-11-18T17:16:20.259Z">
+<meta property="article:modified_time" content="2023-11-18T17:29:36.739Z">
 <meta property="article:author" content="Ivan Zhang">
 <meta property="article:tag" content="Rust">
 <meta property="article:tag" content="TextEditor">
@@ -272,7 +272,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          9.2k 字
+          11k 字
         
       </span>
     
@@ -283,7 +283,7 @@
         
         
         
-          78 分钟
+          88 分钟
         
       </span>
     
@@ -387,6 +387,15 @@
 <p>使用<code>termion</code>库让我们无需直接向终端写入转义序列，因此我们可以按照如下方式修改代码：</p>
 <figure class="highlight diff"><figcaption><span>src/editor.rs</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs diff"><span class="hljs-meta">@@ -29,7 +29,7 @@</span> impl Editor &#123;<br>     &#125;<br> <br>     fn refresh_screen(&amp;self) -&gt; Result&lt;(), std::io::Error&gt; &#123;<br><span class="hljs-deletion">-        print!(&quot;\x1b[2J&quot;);</span><br><span class="hljs-addition">+        print!(&quot;&#123;&#125;&quot;,termion::clear::All);</span><br>         io::stdout().flush()<br>     &#125;<br></code></pre></td></tr></table></figure>
 <p>现在，由于我们现在每次运行程序都会清屏，我们可能会错过编译器提供的有价值的提示。可以通过单独运行<code>cargo build</code>来查看这些警告。但请记住，<strong>如果你的代码没有变化，<code>Rust</code>不会重新编译你的代码</strong>，所以在执行<code>cargo run</code>之后立即运行<code>cargo build</code>并不会显示相同的警告。你可以先运行<code>cargo clean</code>然后再运行<code>cargo build</code>来重新编译整个项目，并查看所有的警告。</p>
+<h2 id="光标重定位">光标重定位</h2>
+<p>在前面的代码中，虽然执行了清屏的操作，但是光标依然会停留在以前的位置。我们需要将光标重新定位到左上角，以便准备从上到下绘制编辑器界面。</p>
+<figure class="highlight diff"><figcaption><span>src/editor.rs</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs diff"><span class="hljs-meta">@@ -29,7 +29,7 @@</span> impl Editor &#123;<br>     &#125;<br> <br>     fn refresh_screen(&amp;self) -&gt; Result&lt;(), std::io::Error&gt; &#123;<br><span class="hljs-deletion">-        print!(&quot;&#123;&#125;&quot;,termion::clear::All);</span><br><span class="hljs-addition">+        print!(&quot;&#123;&#125;&#123;&#125;&quot;, termion::clear::All, termion::cursor::Goto(1, 1));</span><br>         io::stdout().flush()<br>     &#125;<br></code></pre></td></tr></table></figure>
+<p><code>termion</code>库中的转义序列<code>termion::cursor::Goto</code>使用<a target="_blank" rel="noopener" href="https://vt100.net/docs/vt100-ug/chapter3.html#CUP"><code>H</code>命令</a>来定位光标，它实际上需要两个参数：行号和列号，来确定光标的新位置。因此，如果你的终端大小是<code>80x24</code>，并且你想要将光标置于屏幕中心，你可以使用<code>\x1b[12;40H</code>命令（多个参数之间用分号<code>;</code>分隔）。由于行和列的编号是从<code>1</code>开始的，而不是<code>0</code>，所以<code>termion</code>方法也是基于<code>1</code>的索引。</p>
+<h2 id="退出时清屏">退出时清屏</h2>
+<p>当我们的程序崩溃时，就清屏并重新定位光标。如果在渲染屏幕的过程中发生错误，我们不希望屏幕上留下一堆乱码，也不希望错误信息就在光标当前的位置被打印出来。此外，如果用户决定退出，我们也会借此机会打印一条告别信息。</p>
+<figure class="highlight diff"><figcaption><span>src/editor.rs</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs diff"><span class="hljs-meta">@@ -30,6 +30,9 @@</span> impl Editor &#123;<br> <br>     fn refresh_screen(&amp;self) -&gt; Result&lt;(), std::io::Error&gt; &#123;<br>         print!(&quot;&#123;&#125;&#123;&#125;&quot;, termion::clear::All, termion::cursor::Goto(1, 1));<br><span class="hljs-addition">+        if self.should_quit &#123;</span><br><span class="hljs-addition">+            println!(&quot;Goodbye.\r&quot;);</span><br><span class="hljs-addition">+        &#125;</span><br>         io::stdout().flush()<br>     &#125;<br> <br><span class="hljs-meta">@@ -52,5 +55,6 @@</span> fn read_key() -&gt; Result&lt;Key, std::io::Error&gt; &#123;<br> &#125;<br> <br> fn die(e: std::io::Error) &#123;<br><span class="hljs-addition">+    print!(&quot;&#123;&#125;&quot;, termion::clear::All);</span><br>     panic!(&quot;&#123;&#125;&quot;, e);<br> &#125;<br></code></pre></td></tr></table></figure>
+<h2 id=""><code>~</code></h2>
+<p>是时候开始绘制界面了。让我们在屏幕的左侧绘制一列波浪号<code>~</code>，就像<code>vim</code>编辑器那样。在我们的文本编辑器中，我们将在被编辑文件内容结束后的每一行的开头绘制一个波浪号。</p>
 <p>本文链接:  <a href="https://zone.ivan-zhang.com.cn/p/156e55dd.html">https://zone.ivan-zhang.com.cn/p/156e55dd.html</a></p>
 
                 
