@@ -27,7 +27,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://lsky.ivan-zhang.com.cn/i/2023/11/11/654f341780bd6.png">
 <meta property="article:published_time" content="2023-11-14T22:52:50.000Z">
-<meta property="article:modified_time" content="2023-11-19T09:52:51.595Z">
+<meta property="article:modified_time" content="2023-11-19T10:10:35.786Z">
 <meta property="article:author" content="Ivan Zhang">
 <meta property="article:tag" content="Rust">
 <meta property="article:tag" content="TextEditor">
@@ -283,7 +283,7 @@
         
         
         
-          139 分钟
+          142 分钟
         
       </span>
     
@@ -325,7 +325,7 @@
               <p class="note note-info">
                 
                   
-                    本文最后更新于：2023年11月19日 下午
+                    本文最后更新于：2023年11月19日 晚上
                   
                 
               </p>
@@ -416,6 +416,9 @@
 <li>防止<code>u16</code>类型的<code>cursor_position</code>发生溢出。</li>
 </ul>
 <p><strong>关于溢出</strong>，我们的类型有它们可以容纳的最大大小。如前所述，对于 <code>u16</code>，这个限制大约在<code>65,000</code>。那么如果你在最大值上<code>+1</code>会发生什么？它会变成可能的最小值，也就是对于无符号类型来说是<code>0</code>！这被称为<strong>溢出</strong>。在<code>Rust</code>中处理溢出的正常方式如下：在调试模式（默认情况下我们使用的模式）中，程序会崩溃。这是我们所期望的：**编译器不应该试图让你的程序保持运行，而应该明显地显示出问题。**在生产模式下，会发生溢出，这也是我们所期望的，**因为我们不希望应用程序在生产中意外崩溃，它可以继续使用溢出值。**在我们的程序中我们使用 <code>saturating_add</code> 尝试<code>+1</code>，否则就返回最大值。</p>
+<h2 id="最后一行">最后一行</h2>
+<p>你可能注意到屏幕的最后一行似乎没有波浪符号。这是代码中的一个小错误。当我们打印最后一个波浪符号时，我们接着打印了一个 <code>&quot;\r\n&quot;</code>，就像打印其他任何一行一样，但这会导致终端滚动以腾出空间给一个新的空白行。由于我们稍后想在底部有一个状态栏，现在让我们先改变我们绘制行的范围。</p>
+<figure class="highlight diff"><figcaption><span>src/editor.rs</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs diff"><span class="hljs-meta">@@ -50,7 +50,7 @@</span> impl Editor &#123;<br>     &#125;<br> <br>     fn draw_rows(&amp;self) &#123;<br><span class="hljs-deletion">-        for _ in 0..self.terminal.size().height &#123;</span><br><span class="hljs-addition">+        for _ in 0..self.terminal.size().height - 1 &#123;</span><br>             println!(&quot;~\r&quot;);<br></code></pre></td></tr></table></figure>
 <p>本文链接:  <a href="https://zone.ivan-zhang.com.cn/p/156e55dd.html">https://zone.ivan-zhang.com.cn/p/156e55dd.html</a></p>
 
                 
