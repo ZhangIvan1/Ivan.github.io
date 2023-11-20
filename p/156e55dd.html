@@ -27,7 +27,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://lsky.ivan-zhang.com.cn/i/2023/11/11/654f341780bd6.png">
 <meta property="article:published_time" content="2023-11-14T22:52:50.000Z">
-<meta property="article:modified_time" content="2023-11-20T06:34:33.536Z">
+<meta property="article:modified_time" content="2023-11-20T06:38:31.921Z">
 <meta property="article:author" content="Ivan Zhang">
 <meta property="article:tag" content="Rust">
 <meta property="article:tag" content="TextEditor">
@@ -454,7 +454,8 @@
 <h2 id="防止光标移出屏幕">防止光标移出屏幕</h2>
 <p>目前，光标位置<code>cursor_position</code>的值可能会超出屏幕的右侧和底部边界。我们可以通过在<code>move_cursor()</code>函数中进行边界检查来预防这一问题。</p>
 <figure class="highlight diff"><figcaption><span>src/editor.rs</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs diff"><span class="hljs-meta">@@ -65,11 +63,22 @@</span> impl Editor &#123;<br> <br>     fn move_cursor(&amp;mut self, key: Key) &#123;<br>         let Position &#123; mut x, mut y &#125; = self.cursor_position;<br><span class="hljs-addition">+        let size = self.terminal.size();</span><br><span class="hljs-addition">+        let height = size.height.saturating_sub(1) as usize;</span><br><span class="hljs-addition">+        let width = size.width.saturating_sub(1) as usize;</span><br>         match key &#123;<br>             Key::Up =&gt; y = y.saturating_sub(1),<br><span class="hljs-deletion">-            Key::Down =&gt; y = y.saturating_add(1),</span><br><span class="hljs-addition">+            Key::Down =&gt; &#123;</span><br><span class="hljs-addition">+                if y &lt; height &#123;</span><br><span class="hljs-addition">+                    y = y.saturating_add(1);</span><br><span class="hljs-addition">+                &#125;</span><br><span class="hljs-addition">+            &#125;</span><br>             Key::Left =&gt; x = x.saturating_sub(1),<br><span class="hljs-deletion">-            Key::Right =&gt; x = x.saturating_add(1),</span><br><span class="hljs-addition">+            Key::Right =&gt; &#123;</span><br><span class="hljs-addition">+                if x &lt; width &#123;</span><br><span class="hljs-addition">+                    x = x.saturating_add(1);</span><br><span class="hljs-addition">+                &#125;</span><br><span class="hljs-addition">+            &#125;</span><br>             _ =&gt; (),<br>         &#125;<br>         self.cursor_position = Position &#123; x, y &#125;<br></code></pre></td></tr></table></figure>
-<p>你应该能够确认现在可以在可见区域内移动光标，并且光标会保持在终端的边界内。你还可以将光标放在最后一行，尽管那里目前还没有波浪号，但这一点我们后面会修复。</p>
+<p>你应该能够确认现在可以在可见区域内移动光标，并且光标会保持在终端的边界内。你还可以将光标放在最后一行，尽管那里目前还没有<code>~</code>。</p>
+<h2 id=""></h2>
 <p>本文链接:  <a href="https://zone.ivan-zhang.com.cn/p/156e55dd.html">https://zone.ivan-zhang.com.cn/p/156e55dd.html</a></p>
 
                 
