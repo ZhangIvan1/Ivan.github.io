@@ -27,7 +27,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://lsky.ivan-zhang.com.cn/i/2023/10/24/6537b1575e576.png">
 <meta property="article:published_time" content="2023-10-25T11:01:16.000Z">
-<meta property="article:modified_time" content="2023-11-20T07:24:47.809Z">
+<meta property="article:modified_time" content="2023-11-21T03:31:34.971Z">
 <meta property="article:author" content="Ivan Zhang">
 <meta property="article:tag" content="CS144">
 <meta property="article:tag" content="计算机网络">
@@ -273,7 +273,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          473 字
+          1.6k 字
         
       </span>
     
@@ -284,7 +284,7 @@
         
         
         
-          4 分钟
+          14 分钟
         
       </span>
     
@@ -326,7 +326,7 @@
               <p class="note note-info">
                 
                   
-                    本文最后更新于：2023年11月20日 下午
+                    本文最后更新于：2023年11月21日 中午
                   
                 
               </p>
@@ -350,6 +350,7 @@
 <p>在<code>Lab0</code>中介绍过，<code>TCP</code>是在不可靠的链路上提供<strong>尽力而为</strong>的可靠传输。为了实现这一目的，在<code>TCP</code>中，<code>TCPSender</code>需要确保每一个<code>Segment</code>都被成功接收。</p>
 </blockquote>
 <p>每当一个<code>Segment</code>被发送出去，<code>TCPSender</code>会记录其发送的时间并标记为<strong>未完成的</strong>，当超过<code>retransmission timeout(RTO)</code>毫秒后，如果依然没有确认收到，就会进行重传。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><code class="hljs C++"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Timer</span> &#123;<br>  <span class="hljs-keyword">private</span>:<br>    <span class="hljs-type">bool</span> _is_running = <span class="hljs-literal">false</span>;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> _consecutive_retransmissions_times = <span class="hljs-number">0</span>;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> _retransmission_timeout = <span class="hljs-number">0</span>;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> _time_passed = <span class="hljs-number">0</span>;<br><br>  <span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">start</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> _initial_retransmission_timeout)</span> </span>&#123;<br>        _is_running = <span class="hljs-literal">true</span>;<br>        _consecutive_retransmissions_times = <span class="hljs-number">0</span>;<br>        _retransmission_timeout = _initial_retransmission_timeout;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">stop</span><span class="hljs-params">()</span> </span>&#123; _is_running = <span class="hljs-literal">false</span>; &#125;<br><br>    <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">reset</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> _initial_retransmission_timeout)</span> </span>&#123;<br>        <span class="hljs-built_in">stop</span>();<br>        <span class="hljs-built_in">start</span>(_initial_retransmission_timeout);<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">restart</span><span class="hljs-params">()</span> </span>&#123; _time_passed = <span class="hljs-number">0</span>; &#125;<br><br>    <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">time_update</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> ms_since_last_tick)</span> </span>&#123;<br>        <span class="hljs-keyword">if</span> (_is_running)<br>            _time_passed += ms_since_last_tick;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">slow_start</span><span class="hljs-params">()</span> </span>&#123;<br>        _consecutive_retransmissions_times = <span class="hljs-number">0</span>;<br>        _retransmission_timeout *= <span class="hljs-number">2</span>;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">check_expired</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> ms_since_last_tick)</span> </span>&#123;<br>        <span class="hljs-keyword">if</span> (_is_running) &#123;<br>            <span class="hljs-built_in">time_update</span>(ms_since_last_tick);<br>        &#125;<br>        <span class="hljs-keyword">if</span> (_time_passed &gt;= _retransmission_timeout) &#123;<br>            <span class="hljs-built_in">slow_start</span>();<br>            <span class="hljs-built_in">restart</span>();<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> <span class="hljs-title">consecutive_retransmissions_times</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> _consecutive_retransmissions_times; &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
 <h2 id="B-Implementing-the-TCP-sender">B. Implementing the TCP sender</h2>
 <p>本文链接:  <a href="https://zone.ivan-zhang.com.cn/p/785ad61c.html">https://zone.ivan-zhang.com.cn/p/785ad61c.html</a></p>
 
@@ -420,7 +421,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2023年11月20日</div>
+          <div>2023年11月21日</div>
         </div>
       
       
