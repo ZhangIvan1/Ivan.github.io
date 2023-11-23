@@ -27,7 +27,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://lsky.ivan-zhang.com.cn/i/2023/10/24/6537b1575e576.png">
 <meta property="article:published_time" content="2023-10-25T11:01:16.000Z">
-<meta property="article:modified_time" content="2023-11-23T13:36:30.478Z">
+<meta property="article:modified_time" content="2023-11-23T13:37:41.809Z">
 <meta property="article:author" content="Ivan Zhang">
 <meta property="article:tag" content="CS144">
 <meta property="article:tag" content="计算机网络">
@@ -359,7 +359,7 @@
 <li>当<code>Tick()</code>函数被调用，且已经过期时：
 <ul>
 <li>立即重传最早的未被确认的<code>Segment</code>。</li>
-<li>如果<code>window size</code>非零：(指数退避)
+<li>如果<code>window size</code>非零：<strong>(指数退避)</strong>
 <ul>
 <li>记录连续重传次数<code>consecutive retransmissions</code>，并在发生重传时增加它。</li>
 <li><code>RTO *= RTO</code>。</li>
