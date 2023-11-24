@@ -27,7 +27,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://lsky.ivan-zhang.com.cn/i/2023/10/24/6537b1575e576.png">
 <meta property="article:published_time" content="2023-10-25T11:01:16.000Z">
-<meta property="article:modified_time" content="2023-11-24T09:04:04.868Z">
+<meta property="article:modified_time" content="2023-11-24T09:12:17.704Z">
 <meta property="article:author" content="Ivan Zhang">
 <meta property="article:tag" content="CS144">
 <meta property="article:tag" content="计算机网络">
@@ -449,7 +449,7 @@
 <ul>
 <li>先计算能填装的数据量，<code>fill_size</code>和<code>MAX_PAYLOAD_SIZE</code>取最小。</li>
 <li>填装数据。</li>
-<li>如果装完之后发现数据流终止了，我们就可以设置<code>fin</code>信号了。（注意<code>fin</code>也会占用一个<code>seqno</code>，所以需要先确认当前<code>Segment</code>是否能装下，否则就要等下一个了）</li>
+<li>如果装完之后发现数据流终止了，我们就可以设置<code>fin</code>信号了。（注意<code>fin</code>也会占用一个<code>seqno</code>，所以需要先确认这次发送是否能装下，否则就要等下一轮了）</li>
 <li>将<code>Segment</code>发送出去，并更新<code>_next_seqno</code>。</li>
 </ul>
 <p>如果在发送<code>Segment</code>时<code>Timer</code>没有运行的话，就启动<code>Timer</code>。</p>
