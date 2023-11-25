@@ -27,7 +27,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://lsky.ivan-zhang.com.cn/i/2023/11/20/655b09fb7859c.png">
 <meta property="article:published_time" content="2023-11-24T06:52:58.000Z">
-<meta property="article:modified_time" content="2023-11-25T07:14:08.818Z">
+<meta property="article:modified_time" content="2023-11-25T07:17:59.073Z">
 <meta property="article:author" content="Ivan Zhang">
 <meta property="article:tag" content="Rust">
 <meta property="article:tag" content="TextEditor">
@@ -272,7 +272,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          5.3k 字
+          5.9k 字
         
       </span>
     
@@ -283,7 +283,7 @@
         
         
         
-          45 分钟
+          50 分钟
         
       </span>
     
@@ -358,6 +358,9 @@
 <p>在<code>Document</code>中，我们添加了一个方法来检索特定索引处的<code>Row</code>。我们使用<code>Vector</code>的<code>get</code>方法：如果索引超出范围则返回<code>None</code>，否则返回拥有的<code>Row</code>。</p>
 <p>现在让我们看<code>Editor</code>。在<code>draw_rows</code>中，我们首先将变量<code>row</code>重命名为<code>terminal_row</code>以避免与我们现在从<code>Document</code>中获取的行混淆。然后我们检索<code>row</code>并显示它。<code>Row</code>确保返回一个可以显示的子字符串，而<code>Editor</code>确保满足终端尺寸的要求。</p>
 <p>然而，我们的欢迎消息仍然被显示出来。当用户打开一个文件时，我们不希望显示这个消息，所以让我们为<code>Document</code>添加一个<code>is_empty</code>方法，并在<code>draw_rows</code>中检查它。</p>
+<figure class="highlight diff"><figcaption><span>src/document.rs</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs diff"><span class="hljs-meta">@@ -14,4 +14,7 @@</span> impl Document &#123;<br>     pub fn row(&amp;self, index: usize) -&gt; Option&lt;&amp;Row&gt; &#123;<br>         self.rows.get(index)<br>     &#125;<br><span class="hljs-addition">+    pub fn is_empty(&amp;self) -&gt; bool &#123;</span><br><span class="hljs-addition">+        self.rows.is_empty()</span><br><span class="hljs-addition">+    &#125;</span><br> &#125;<br></code></pre></td></tr></table></figure>
+<figure class="highlight diff"><figcaption><span>src/editor.rs</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs diff"><span class="hljs-meta">@@ -106,7 +106,7 @@</span> impl Editor &#123;<br>             Terminal::clear_current_line();<br>             if let Some(row) = self.document.row(terminal_row as usize) &#123;<br>                 self.draw_row(row);<br><span class="hljs-deletion">-            &#125; else if terminal_row == height / 3 &#123;</span><br><span class="hljs-addition">+            &#125; else if self.document.is_empty() &amp;&amp; terminal_row == height / 3 &#123;</span><br>                 self.draw_welcome_message();<br>             &#125; else &#123;<br>                 println!(&quot;~\r&quot;)<br></code></pre></td></tr></table></figure>
+<p>现在屏幕中间不再显示那条消息了。接下来，让我们允许用户打开并显示实际文件。我们从修改<code>Document</code>开始：</p>
 <p>本文链接:  <a href="https://zone.ivan-zhang.com.cn/p/c5a87dbb.html">https://zone.ivan-zhang.com.cn/p/c5a87dbb.html</a></p>
 
                 
