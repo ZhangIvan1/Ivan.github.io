@@ -27,7 +27,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://lsky.ivan-zhang.com.cn/i/2023/11/20/655b09fb7859c.png">
 <meta property="article:published_time" content="2023-11-24T06:52:58.000Z">
-<meta property="article:modified_time" content="2023-11-25T06:28:09.677Z">
+<meta property="article:modified_time" content="2023-11-25T06:55:40.381Z">
 <meta property="article:author" content="Ivan Zhang">
 <meta property="article:tag" content="Rust">
 <meta property="article:tag" content="TextEditor">
@@ -272,7 +272,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          3.1k 字
+          3.3k 字
         
       </span>
     
@@ -283,7 +283,7 @@
         
         
         
-          27 分钟
+          28 分钟
         
       </span>
     
@@ -349,6 +349,8 @@
 <figure class="highlight diff"><figcaption><span>src/document.rs</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs diff"><span class="hljs-meta">@@ -3,4 +3,12 @@</span> use crate::Row;<br> #[derive(Default)]<br> pub struct Document &#123;<br>     rows: Vec&lt;Row&gt;,<br><span class="hljs-deletion">-&#125;</span><br>\ No newline at end of file<br><span class="hljs-addition">+&#125;</span><br><span class="hljs-addition">+</span><br><span class="hljs-addition">+impl Document &#123;</span><br><span class="hljs-addition">+    pub fn open() -&gt; Self &#123;</span><br><span class="hljs-addition">+        let mut rows = Vec::new();</span><br><span class="hljs-addition">+        rows.push(Row::from(&quot;Hello, World!&quot;));</span><br><span class="hljs-addition">+        Self &#123; rows &#125;</span><br><span class="hljs-addition">+    &#125;</span><br><span class="hljs-addition">+&#125;</span><br></code></pre></td></tr></table></figure>
 <figure class="highlight diff"><figcaption><span>src/editor.rs</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs diff"><span class="hljs-meta">@@ -36,7 +36,7 @@</span> impl Editor &#123;<br>             should_quit: false,<br>             terminal: Terminal::default().expect(&quot;Failed to initialize terminal&quot;),<br>             cursor_position: Position::default(),<br><span class="hljs-deletion">-            document: Document::default(),</span><br><span class="hljs-addition">+            document: Document::open(),</span><br>         &#125;<br>     &#125;<br></code></pre></td></tr></table></figure>
 <figure class="highlight diff"><figcaption><span>src/row.rs</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs diff"><span class="hljs-meta">@@ -1,3 +1,11 @@</span><br> pub struct Row &#123;<br><span class="hljs-deletion">-    string: String</span><br><span class="hljs-addition">+    string: String,</span><br><span class="hljs-addition">+&#125;</span><br><span class="hljs-addition">+</span><br><span class="hljs-addition">+impl From&lt;&amp;str&gt; for Row &#123;</span><br><span class="hljs-addition">+    fn from(slice: &amp;str) -&gt; Self &#123;</span><br><span class="hljs-addition">+        Self &#123;</span><br><span class="hljs-addition">+            string: String::from(slice),</span><br><span class="hljs-addition">+        &#125;</span><br><span class="hljs-addition">+    &#125;</span><br> &#125;<br></code></pre></td></tr></table></figure>
+<p>你可能对行的<code>impl</code>块中的<code>From&lt;&amp;str&gt;</code>部分感到好奇。现在我们不仅仅是实现了一个<code>from</code>函数，而且是通过实现<code>Row</code>的<code>From</code>特质来完成的。</p>
+<p>之后我们会实现一个从文件打开<code>Document</code>的方法，我们会再次使用1来初始化我们的<code>editor</code>。但现在，让我们先关注如何显示。</p>
 <p>本文链接:  <a href="https://zone.ivan-zhang.com.cn/p/c5a87dbb.html">https://zone.ivan-zhang.com.cn/p/c5a87dbb.html</a></p>
 
                 
