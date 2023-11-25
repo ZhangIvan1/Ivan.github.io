@@ -18,22 +18,21 @@
   <meta name="author" content="Ivan Zhang">
   <meta name="keywords" content="">
   
-    <meta name="description" content="The arrangement of modules and dataflow in TCP implementation.  本文链接:  https:&#x2F;&#x2F;zone.ivan-zhang.com.cn&#x2F;p&#x2F;ac172a13.html">
+    <meta name="description" content="显示行 我们需要一个额外的数据结构：Document，代表用户当前正在编辑的文档，以及文档中的Row。 src&#x2F;document.rs1234567@@ -0,0 +1,6 @@+use crate::Row;++#[derive(Default)]+pub struct Document &amp;#123;+    rows: Vec&lt;Row&gt;,+&amp;#125; src&#x2F;editor.rs1">
 <meta property="og:type" content="article">
-<meta property="og:title" content="CS144计算机网络Lab4: The Summit (TCP in Full)">
-<meta property="og:url" content="https://zone.ivan-zhang.com.cn/p/ac172a13">
+<meta property="og:title" content="Rust学习-制作一个文本编辑器: A Text Viewer">
+<meta property="og:url" content="https://zone.ivan-zhang.com.cn/p/c5a87dbb">
 <meta property="og:site_name" content="Ivan Zone">
-<meta property="og:description" content="The arrangement of modules and dataflow in TCP implementation.  本文链接:  https:&#x2F;&#x2F;zone.ivan-zhang.com.cn&#x2F;p&#x2F;ac172a13.html">
+<meta property="og:description" content="显示行 我们需要一个额外的数据结构：Document，代表用户当前正在编辑的文档，以及文档中的Row。 src&#x2F;document.rs1234567@@ -0,0 +1,6 @@+use crate::Row;++#[derive(Default)]+pub struct Document &amp;#123;+    rows: Vec&lt;Row&gt;,+&amp;#125; src&#x2F;editor.rs1">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://lsky.ivan-zhang.com.cn/i/2023/10/24/6537b1575e576.png">
-<meta property="article:published_time" content="2023-11-23T06:52:41.000Z">
-<meta property="article:modified_time" content="2023-11-23T14:53:27.331Z">
+<meta property="og:image" content="http://lsky.ivan-zhang.com.cn/i/2023/11/20/655b09fb7859c.png">
+<meta property="article:published_time" content="2023-11-24T06:52:58.000Z">
+<meta property="article:modified_time" content="2023-11-25T05:54:59.109Z">
 <meta property="article:author" content="Ivan Zhang">
-<meta property="article:tag" content="CS144">
-<meta property="article:tag" content="计算机网络">
-<meta property="article:tag" content="Lab">
+<meta property="article:tag" content="Rust">
+<meta property="article:tag" content="TextEditor">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://lsky.ivan-zhang.com.cn/i/2023/10/24/6537b1575e576.png">
+<meta name="twitter:image" content="http://lsky.ivan-zhang.com.cn/i/2023/11/20/655b09fb7859c.png">
   
   
     <meta name="referrer" content="no-referrer-when-downgrade">
@@ -41,7 +40,7 @@
   
     <meta name="google-site-verification" content="QRmYEV3TU5Xl3W3amshmcmMfL2Vl-TKfcOA9E-TKwR0" />
   
-  <title>CS144计算机网络Lab4: The Summit (TCP in Full) - Ivan Zone</title>
+  <title>Rust学习-制作一个文本编辑器: A Text Viewer - Ivan Zone</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -250,7 +249,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="CS144计算机网络Lab4: The Summit (TCP in Full)"></span>
+            <span id="subtitle" data-typed-text="Rust学习-制作一个文本编辑器: A Text Viewer"></span>
           
         </div>
 
@@ -261,8 +260,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2023-11-23 14:52" pubdate>
-          2023年11月23日 下午
+        <time datetime="2023-11-24 14:52" pubdate>
+          2023年11月24日 下午
         </time>
       </span>
     
@@ -273,7 +272,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          105 字
+          1k 字
         
       </span>
     
@@ -284,7 +283,7 @@
         
         
         
-          1 分钟
+          9 分钟
         
       </span>
     
@@ -321,12 +320,12 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">CS144计算机网络Lab4: The Summit (TCP in Full)</h1>
+            <h1 id="seo-header">Rust学习-制作一个文本编辑器: A Text Viewer</h1>
             
               <p class="note note-info">
                 
                   
-                    本文最后更新于：2023年11月23日 晚上
+                    本文最后更新于：2023年11月25日 下午
                   
                 
               </p>
@@ -334,11 +333,13 @@
             
               <div class="markdown-body">
                 
-                <center>
-  <img src="http://lsky.ivan-zhang.com.cn/i/2023/10/15/652c095ff0876.png" srcset="/img/loading.gif" lazyload alt="CS144TCPSocket" style="zoom:25%;" /><br>
-  <font color="DimGray" size="3">The arrangement of modules and dataflow in TCP implementation.</font>
-</center>
-<p>本文链接:  <a href="https://zone.ivan-zhang.com.cn/p/ac172a13.html">https://zone.ivan-zhang.com.cn/p/ac172a13.html</a></p>
+                <h2 id="显示行">显示行</h2>
+<p>我们需要一个额外的数据结构：<code>Document</code>，代表用户当前正在编辑的文档，以及文档中的<code>Row</code>。</p>
+<figure class="highlight diff"><figcaption><span>src/document.rs</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs diff"><span class="hljs-meta">@@ -0,0 +1,6 @@</span><br><span class="hljs-addition">+use crate::Row;</span><br><span class="hljs-addition">+</span><br><span class="hljs-addition">+#[derive(Default)]</span><br><span class="hljs-addition">+pub struct Document &#123;</span><br><span class="hljs-addition">+    rows: Vec&lt;Row&gt;,</span><br><span class="hljs-addition">+&#125;</span><br></code></pre></td></tr></table></figure>
+<figure class="highlight diff"><figcaption><span>src/editor.rs</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs diff"><span class="hljs-meta">@@ -1,5 +1,6 @@</span><br> use crate::Terminal;<br> use termion::event::Key;<br><span class="hljs-addition">+use crate::Document;</span><br> <br> const VERSION: &amp;str = env!(&quot;CARGO_PKG_VERSION&quot;);<br> <br><span class="hljs-meta">@@ -11,6 +12,7 @@</span> pub struct Editor &#123;<br>     should_quit: bool,<br>     terminal: Terminal,<br>     cursor_position: Position,<br><span class="hljs-addition">+    document: Document,</span><br> &#125;<br> <br> impl Editor &#123;<br><span class="hljs-meta">@@ -33,6 +35,7 @@</span> impl Editor &#123;<br>             should_quit: false,<br>             terminal: Terminal::default().expect(&quot;Failed to initialize terminal&quot;),<br>             cursor_position: Position &#123; x: 0, y: 0 &#125;,<br><span class="hljs-addition">+            document: Document::default(),</span><br>         &#125;<br>     &#125;<br></code></pre></td></tr></table></figure>
+<figure class="highlight diff"><figcaption><span>src/main.rs</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs diff"><span class="hljs-meta">@@ -2,10 +2,14 @@</span><br> <br> mod editor;<br> mod terminal;<br><span class="hljs-addition">+mod row;</span><br><span class="hljs-addition">+mod document;</span><br> <br> use editor::Editor;<br> pub use terminal::Terminal;<br> pub use editor::Position;<br><span class="hljs-addition">+pub use row::Row;</span><br><span class="hljs-addition">+pub use document::Document;</span><br> <br> fn main() &#123;<br>     Editor::default().run()<br></code></pre></td></tr></table></figure>
+<figure class="highlight diff"><figcaption><span>src/row.rs</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs diff"><span class="hljs-addition">+pub struct Row &#123;</span><br><span class="hljs-addition">+    string: String</span><br><span class="hljs-addition">+&#125;</span><br></code></pre></td></tr></table></figure>
+<p>本文链接:  <a href="https://zone.ivan-zhang.com.cn/p/undefined.html">https://zone.ivan-zhang.com.cn/p/undefined.html</a></p>
 
                 
               </div>
@@ -357,7 +358,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" class="category-chain-item">计算机网络</a>
+  <a href="/categories/%E8%AF%AD%E8%A8%80%E5%AD%A6%E4%B9%A0/" class="category-chain-item">语言学习</a>
   
   
 
@@ -372,11 +373,9 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/CS144/" class="print-no-link">#CS144</a>
+        <a href="/tags/Rust/" class="print-no-link">#Rust</a>
       
-        <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" class="print-no-link">#计算机网络</a>
-      
-        <a href="/tags/Lab/" class="print-no-link">#Lab</a>
+        <a href="/tags/TextEditor/" class="print-no-link">#TextEditor</a>
       
     </div>
   
@@ -388,8 +387,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>CS144计算机网络Lab4: The Summit (TCP in Full)</div>
-      <div>https://zone.ivan-zhang.com.cn/p/ac172a13</div>
+      <div>Rust学习-制作一个文本编辑器: A Text Viewer</div>
+      <div>https://zone.ivan-zhang.com.cn/p/c5a87dbb</div>
     </div>
     <div class="license-meta">
       
@@ -401,13 +400,13 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2023年11月23日</div>
+          <div>2023年11月24日</div>
         </div>
       
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2023年11月23日</div>
+          <div>2023年11月25日</div>
         </div>
       
       
@@ -438,18 +437,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/p/c5a87dbb" title="Rust学习-制作一个文本编辑器: A Text Viewer">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Rust学习-制作一个文本编辑器: A Text Viewer</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/p/156e55dd" title="Rust学习-制作一个文本编辑器: Raw Input And Output">
-                        <span class="hidden-mobile">Rust学习-制作一个文本编辑器: Raw Input And Output</span>
+                      <a href="/p/ac172a13" title="CS144计算机网络Lab4: The Summit (TCP in Full)">
+                        <span class="hidden-mobile">CS144计算机网络Lab4: The Summit (TCP in Full)</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
