@@ -27,7 +27,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://lsky.ivan-zhang.com.cn/i/2023/11/20/655b09fb7859c.png">
 <meta property="article:published_time" content="2023-11-24T06:52:58.000Z">
-<meta property="article:modified_time" content="2023-11-25T07:43:38.796Z">
+<meta property="article:modified_time" content="2023-11-26T08:50:47.819Z">
 <meta property="article:author" content="Ivan Zhang">
 <meta property="article:tag" content="Rust">
 <meta property="article:tag" content="TextEditor">
@@ -272,7 +272,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          7.6k 字
+          8.2k 字
         
       </span>
     
@@ -283,7 +283,7 @@
         
         
         
-          64 分钟
+          69 分钟
         
       </span>
     
@@ -325,7 +325,7 @@
               <p class="note note-info">
                 
                   
-                    本文最后更新于：2023年11月25日 下午
+                    本文最后更新于：2023年11月26日 下午
                   
                 
               </p>
@@ -366,6 +366,11 @@
 <p>我们目前在启动时使用一个默认的<code>Document</code>，并更新了<code>open</code>方法，该方法尝试打开一个文件，并在失败时返回错误。<code>open</code>将行读入我们的<code>Document</code>结构体。需要注意的是，<code>rows</code>中的每一行都不会包含行结束符<code>\n</code>或者<code>\r\n</code>，因为<code>Rust</code>的<code>line()</code>方法会剪切掉它们。</p>
 <p>现在让我们实际使用<code>open</code>来打开一个文件，这个文件将通过命令行传递给<code>iTEditor</code>。</p>
 <figure class="highlight diff"><figcaption><span>src/editor.rs</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs diff"><span class="hljs-meta">@@ -1,6 +1,7 @@</span><br> use crate::Document;<br> use crate::Row;<br> use crate::Terminal;<br><span class="hljs-addition">+use std::env;</span><br> use termion::event::Key;<br> <br> const VERSION: &amp;str = env!(&quot;CARGO_PKG_VERSION&quot;);<br><span class="hljs-meta">@@ -33,11 +34,19 @@</span> impl Editor &#123;<br>     &#125;<br> <br>     pub fn default() -&gt; Self &#123;<br><span class="hljs-addition">+        let args: Vec&lt;String&gt; = env::args().collect();</span><br><span class="hljs-addition">+        let document = if args.len() &gt; 1 &#123;</span><br><span class="hljs-addition">+            let file_name = &amp;args[1];</span><br><span class="hljs-addition">+            Document::open(&amp;file_name).unwrap_or_default()</span><br><span class="hljs-addition">+        &#125; else &#123;</span><br><span class="hljs-addition">+            Document::default()</span><br><span class="hljs-addition">+        &#125;;</span><br><span class="hljs-addition">+</span><br>         Self &#123;<br>             should_quit: false,<br>             terminal: Terminal::default().expect(&quot;Failed to initialize terminal&quot;),<br>             cursor_position: Position::default(),<br><span class="hljs-deletion">-            document: Document::default(),</span><br><span class="hljs-addition">+            document,</span><br>         &#125;<br>     &#125;<br></code></pre></td></tr></table></figure>
+<h2 id="滚动浏览">滚动浏览</h2>
+<p>现在，我们希望能够滚动浏览整个文件，而不仅仅是看到文件的前几行。让我们给编辑器状态添加一个偏移量<code>offset</code>，用以追踪用户当前滚动到文件的哪一行。我们将复用<code>Position</code>结构体。</p>
+<figure class="highlight diff"><figcaption><span>src/editor.rs</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs diff"><span class="hljs-meta">@@ -16,6 +16,7 @@</span> pub struct Editor &#123;<br>     terminal: Terminal,<br>     cursor_position: Position,<br>     document: Document,<br><span class="hljs-addition">+    offset: Position,</span><br> &#125;<br> <br> impl Editor &#123;<br><span class="hljs-meta">@@ -47,6 +48,7 @@</span> impl Editor &#123;<br>             terminal: Terminal::default().expect(&quot;Failed to initialize terminal&quot;),<br>             cursor_position: Position::default(),<br>             document,<br><span class="hljs-addition">+            offset: Position::default(),</span><br>         &#125;<br>     &#125;<br></code></pre></td></tr></table></figure>
+<p>用<code>defult</code>来初始化它，这意味着默认情况下文件会滚动到左上角。</p>
+<p>现在，让我们修改<code>draw_row()</code>函数，使其能够根据<code>offset.x</code>的值显示文件正确的行范围，同时让<code>draw_rows()</code>函数根据<code>offset.y</code>的值显示正确的行数范围。</p>
 <p>本文链接:  <a href="https://zone.ivan-zhang.com.cn/p/c5a87dbb.html">https://zone.ivan-zhang.com.cn/p/c5a87dbb.html</a></p>
 
                 
@@ -433,7 +438,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2023年11月25日</div>
+          <div>2023年11月26日</div>
         </div>
       
       
