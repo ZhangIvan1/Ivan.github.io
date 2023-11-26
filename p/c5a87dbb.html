@@ -27,7 +27,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://lsky.ivan-zhang.com.cn/i/2023/11/20/655b09fb7859c.png">
 <meta property="article:published_time" content="2023-11-24T06:52:58.000Z">
-<meta property="article:modified_time" content="2023-11-26T09:08:11.301Z">
+<meta property="article:modified_time" content="2023-11-26T09:12:59.553Z">
 <meta property="article:author" content="Ivan Zhang">
 <meta property="article:tag" content="Rust">
 <meta property="article:tag" content="TextEditor">
@@ -272,7 +272,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          10k 字
+          11k 字
         
       </span>
     
@@ -283,7 +283,7 @@
         
         
         
-          84 分钟
+          89 分钟
         
       </span>
     
@@ -375,6 +375,10 @@
 <p>我们将偏移量添加到字符串的开始和结束位置，以获得我们所需的字符串切片。我们也确保了在字符串长度不足以填充屏幕时的情况能得到处理。如果当前行在屏幕左侧结束（如果我们在一行很长的行中滚动到右侧时可能会发生），<code>Row</code>的<code>render</code>方法将返回一个空字符串。</p>
 <p>我们在哪里设置<code>offset</code>的值呢？我们的策略将是检查光标是否已移动到可见窗口之外，如果是的话，就调整<code>offset</code>以使光标正好在可见窗口内。我们将这个逻辑放在一个名为<code>scroll</code>的函数中，并在处理按键后立即调用它。</p>
 <figure class="highlight diff"><figcaption><span>src/editor.rs</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs diff"><span class="hljs-meta">@@ -81,6 +81,7 @@</span> impl Editor &#123;<br>             | Key::PageDown =&gt; self.move_cursor(pressed_key),<br>             _ =&gt; (),<br>         &#125;<br><span class="hljs-addition">+        self.scroll();</span><br>         Ok(())<br>     &#125;<br> <br><span class="hljs-meta">@@ -143,6 +144,23 @@</span> impl Editor &#123;<br>         let row = row.render(start, end);<br>         println!(&quot;&#123;&#125;\r&quot;, row)<br>     &#125;<br><span class="hljs-addition">+</span><br><span class="hljs-addition">+    pub fn scroll(&amp;mut self) &#123;</span><br><span class="hljs-addition">+        let Position &#123; x, y &#125; = self.cursor_position;</span><br><span class="hljs-addition">+        let width = self.terminal.size().width as usize;</span><br><span class="hljs-addition">+        let height = self.terminal.size().height as usize;</span><br><span class="hljs-addition">+        let offset = &amp;mut self.offset;</span><br><span class="hljs-addition">+        if y &lt; offset.y &#123;</span><br><span class="hljs-addition">+            offset.y = y;</span><br><span class="hljs-addition">+        &#125; else if y &gt;= offset.y.saturating_add(height) &#123;</span><br><span class="hljs-addition">+            offset.y = y.saturating_sub(height).saturating_add(1);</span><br><span class="hljs-addition">+        &#125;</span><br><span class="hljs-addition">+        if x &lt; offset.x &#123;</span><br><span class="hljs-addition">+            offset.x = x;</span><br><span class="hljs-addition">+        &#125; else if x &gt;= offset.x.saturating_add(width) &#123;</span><br><span class="hljs-addition">+            offset.x = x.saturating_sub(width).saturating_add(1);</span><br><span class="hljs-addition">+        &#125;</span><br><span class="hljs-addition">+    &#125;</span><br> &#125;<br></code></pre></td></tr></table></figure>
+<p>要使用<code>scroll</code>函数，我们需要知道终端的宽度和高度以及当前位置，并且我们想要在<code>self.offset</code>中更改值。如果我们已经向左或向上移动，我们想要将我们的偏移设置为文档中的新位置。如果我们向右滚动得太远，我们将从新位置减去当前偏移来计算新偏移。</p>
+<p>现在，让我们允许光标超过屏幕底部前进（但不超过文件底部）。</p>
+<figure class="highlight diff"><figcaption><span>src/document.rs</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs diff"><span class="hljs-meta">@@ -21,4 +21,7 @@</span> impl Document &#123;<br>     pub fn is_empty(&amp;self) -&gt; bool &#123;<br>         self.rows.is_empty()<br>     &#125;<br><span class="hljs-addition">+    pub fn len(&amp;self) -&gt; usize &#123;</span><br><span class="hljs-addition">+        self.rows.len()</span><br><span class="hljs-addition">+    &#125;</span><br> &#125;<br></code></pre></td></tr></table></figure>
+<figure class="highlight diff"><figcaption><span>src/editor.rs</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs diff"><span class="hljs-meta">@@ -88,7 +88,7 @@</span> impl Editor &#123;<br>     fn move_cursor(&amp;mut self, key: Key) &#123;<br>         let Position &#123; mut x, mut y &#125; = self.cursor_position;<br>         let size = self.terminal.size();<br><span class="hljs-deletion">-        let height = size.height.saturating_sub(1) as usize;</span><br><span class="hljs-addition">+        let height = self.document.len();</span><br>         let width = size.width.saturating_sub(1) as usize;<br>         match key &#123;<br>             Key::Up =&gt; y = y.saturating_sub(1),<br></code></pre></td></tr></table></figure>
 <p>本文链接:  <a href="https://zone.ivan-zhang.com.cn/p/c5a87dbb.html">https://zone.ivan-zhang.com.cn/p/c5a87dbb.html</a></p>
 
                 
