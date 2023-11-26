@@ -27,7 +27,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://lsky.ivan-zhang.com.cn/i/2023/11/20/655b09fb7859c.png">
 <meta property="article:published_time" content="2023-11-24T06:52:58.000Z">
-<meta property="article:modified_time" content="2023-11-26T09:12:59.553Z">
+<meta property="article:modified_time" content="2023-11-26T09:14:27.443Z">
 <meta property="article:author" content="Ivan Zhang">
 <meta property="article:tag" content="Rust">
 <meta property="article:tag" content="TextEditor">
@@ -283,7 +283,7 @@
         
         
         
-          89 分钟
+          91 分钟
         
       </span>
     
@@ -379,6 +379,7 @@
 <p>现在，让我们允许光标超过屏幕底部前进（但不超过文件底部）。</p>
 <figure class="highlight diff"><figcaption><span>src/document.rs</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs diff"><span class="hljs-meta">@@ -21,4 +21,7 @@</span> impl Document &#123;<br>     pub fn is_empty(&amp;self) -&gt; bool &#123;<br>         self.rows.is_empty()<br>     &#125;<br><span class="hljs-addition">+    pub fn len(&amp;self) -&gt; usize &#123;</span><br><span class="hljs-addition">+        self.rows.len()</span><br><span class="hljs-addition">+    &#125;</span><br> &#125;<br></code></pre></td></tr></table></figure>
 <figure class="highlight diff"><figcaption><span>src/editor.rs</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs diff"><span class="hljs-meta">@@ -88,7 +88,7 @@</span> impl Editor &#123;<br>     fn move_cursor(&amp;mut self, key: Key) &#123;<br>         let Position &#123; mut x, mut y &#125; = self.cursor_position;<br>         let size = self.terminal.size();<br><span class="hljs-deletion">-        let height = size.height.saturating_sub(1) as usize;</span><br><span class="hljs-addition">+        let height = self.document.len();</span><br>         let width = size.width.saturating_sub(1) as usize;<br>         match key &#123;<br>             Key::Up =&gt; y = y.saturating_sub(1),<br></code></pre></td></tr></table></figure>
+<p>现在，当你运行<code>cargo run Cargo.lock</code>时，就能够滚动浏览整个文件。最后一行的处理可能会有点奇怪，因为我们把光标放在那里，但没有在那里渲染。当我们在本章稍后加入状态栏时，这个问题将得到修复。如果你尝试向上滚动，你可能会注意到光标没有被正确定位。**这是因为状态中的<code>Position</code>不再指屏幕上光标的位置。它指的是光标在文本文件中的位置，但我们仍然将其传递给<code>cursor_position</code>。**为了在屏幕上定位光标，我们现在需要从文档中的位置减去偏移量。</p>
 <p>本文链接:  <a href="https://zone.ivan-zhang.com.cn/p/c5a87dbb.html">https://zone.ivan-zhang.com.cn/p/c5a87dbb.html</a></p>
 
                 
