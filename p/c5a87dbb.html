@@ -27,7 +27,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://lsky.ivan-zhang.com.cn/i/2023/11/20/655b09fb7859c.png">
 <meta property="article:published_time" content="2023-11-24T06:52:58.000Z">
-<meta property="article:modified_time" content="2023-11-27T11:04:00.055Z">
+<meta property="article:modified_time" content="2023-11-27T14:45:38.213Z">
 <meta property="article:author" content="Ivan Zhang">
 <meta property="article:tag" content="Rust">
 <meta property="article:tag" content="TextEditor">
@@ -400,6 +400,8 @@
 <h2 id="行末跳转下一行">行末跳转下一行</h2>
 <p>在光标在行末尾时，按➡️将跳转到下一行开始。</p>
 <figure class="highlight diff"><figcaption><span>src/editor.rs</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs diff"><span class="hljs-meta">@@ -118,7 +118,10 @@</span> impl Editor &#123;<br>             &#125;<br>             Key::Right =&gt; &#123;<br>                 if x &lt; width &#123;<br><span class="hljs-deletion">-                    x = x.saturating_add(1);</span><br><span class="hljs-addition">+                    x += 1;</span><br><span class="hljs-addition">+                &#125; else if y &lt; height &#123;</span><br><span class="hljs-addition">+                    y += 1;</span><br><span class="hljs-addition">+                    x = 0;</span><br>                 &#125;<br>             &#125;<br>             Key::Home =&gt; x = 0,<br></code></pre></td></tr></table></figure>
+<h2 id="特殊字符的长度">特殊字符的长度</h2>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs nginx"><span class="hljs-attribute">aaa</span><br>äää<br>yyy<br>❤❤❤<br></code></pre></td></tr></table></figure>
 <p>本文链接:  <a href="https://zone.ivan-zhang.com.cn/p/c5a87dbb.html">https://zone.ivan-zhang.com.cn/p/c5a87dbb.html</a></p>
 
                 
