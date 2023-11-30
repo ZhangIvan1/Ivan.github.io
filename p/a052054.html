@@ -27,7 +27,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://lsky.ivan-zhang.com.cn/i/2023/11/28/6565be6e6f35c.png">
 <meta property="article:published_time" content="2023-11-29T22:44:08.000Z">
-<meta property="article:modified_time" content="2023-11-30T07:10:10.052Z">
+<meta property="article:modified_time" content="2023-11-30T07:43:39.005Z">
 <meta property="article:author" content="Ivan Zhang">
 <meta property="article:tag" content="Rust">
 <meta property="article:tag" content="TextEditor">
@@ -272,7 +272,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          4k 字
+          5.3k 字
         
       </span>
     
@@ -283,7 +283,7 @@
         
         
         
-          34 分钟
+          45 分钟
         
       </span>
     
@@ -354,6 +354,21 @@
 <figure class="highlight diff"><figcaption><span>src/editor.rs</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs diff"><span class="hljs-meta">@@ -109,6 +109,12 @@</span> impl Editor &#123;<br>                 self.move_cursor(Key::Right);<br>             &#125;<br>             Key::Delete =&gt; self.document.delete(&amp;self.cursor_position),<br><span class="hljs-addition">+            Key::Backspace =&gt; &#123;</span><br><span class="hljs-addition">+                if self.cursor_position.x &gt; 0 || self.cursor_position.y &gt; 0 &#123;</span><br><span class="hljs-addition">+                    self.move_cursor(Key::Left);</span><br><span class="hljs-addition">+                    self.document.delete(&amp;self.cursor_position);</span><br><span class="hljs-addition">+                &#125;</span><br><span class="hljs-addition">+            &#125;</span><br>             Key::Up<br>             | Key::Down<br>             | Key::Left<br></code></pre></td></tr></table></figure>
 <p><code>Backspace</code>现在可以在行内工作了。我们还确保了如果我们位于文档的开头，不会执行删除操作，否则，我们将开始删除光标左侧的元素。</p>
 <h2 id="复杂删除">复杂删除</h2>
+<p>目前我们有两个特殊情况尚未处理：一个是在行的开头使用<code>Backspace</code>，另一个是在行的末尾使用<code>Delete</code>。在我们的实现中，<code>Backspace</code>简单地向左移动，这在行的开头意味着移动到前一行的末尾，然后尝试删除一个字符。这意味着，一旦我们允许在行末进行删除操作，<code>Backspace</code>的情况就会得到解决。</p>
+<figure class="highlight diff"><figcaption><span>src/document.rs</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs diff"><span class="hljs-meta">@@ -42,8 +42,14 @@</span> impl Document &#123;<br>     &#125;<br> <br>     pub fn delete(&amp;mut self, at: &amp;Position) &#123;<br><span class="hljs-deletion">-        if at.y &gt;= self.len() &#123;</span><br><span class="hljs-addition">+        let len = self.len();</span><br><span class="hljs-addition">+        if at.y &gt;= len &#123;</span><br>             return;<br><span class="hljs-addition">+        &#125;</span><br><span class="hljs-addition">+        if at.x == self.rows.get_mut(at.y).unwrap().len() &amp;&amp; at.y &lt; len - 1 &#123;</span><br><span class="hljs-addition">+            let next_row = self.rows.remove(at.y + 1);</span><br><span class="hljs-addition">+            let row = self.rows.get_mut(at.y).unwrap();</span><br><span class="hljs-addition">+            row.append(&amp;next_row);</span><br>         &#125; else &#123;<br>             let row = self.rows.get_mut(at.y).unwrap();<br>             row.delete(at.x);<br></code></pre></td></tr></table></figure>
+<figure class="highlight diff"><figcaption><span>src/row.rs</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs diff"><span class="hljs-meta">@@ -70,4 +70,9 @@</span> impl Row &#123;<br>         &#125;<br>         self.update_len();<br>     &#125;<br><span class="hljs-addition">+</span><br><span class="hljs-addition">+    pub fn append(&amp;mut self, new_row: &amp;Self) &#123;</span><br><span class="hljs-addition">+        self.string = format!(&quot;&#123;&#125;&#123;&#125;&quot;, self.string, new_row.string);</span><br><span class="hljs-addition">+        self.update_len();</span><br><span class="hljs-addition">+    &#125;</span><br> &#125;<br></code></pre></td></tr></table></figure>
+<p>我们在Row中增加了一个新方法<code>append</code>，可以把另一个<code>row</code>的内容追加到末尾。我们在<code>Document</code>中使用这个功能。现在，<code>Document</code>中的代码看起来有点复杂。它所做的是检查我们是否位于一行的末尾，以及是否有另一行跟在这一行之后。如果是这样，我们就从我们的<code>vec</code>中移除下一行并将其追加到当前行。反之，我们就尝试从当前行中删除。</p>
+<blockquote>
+<p>那么，为什么代码看起来这么复杂呢？我们能否简单地将<code>row</code>的定义移动到 if 语句之上，以使事情更清楚些？</p>
+<blockquote>
+<p>这是我们第二次大规模遇到 Rust 的借用检查器问题。我们不能同时对向量内的元素持有两个可变引用，我们也不能在对向量内的一个元素持有可变引用时修改向量。为什么？因为比方说我们有一个包含 A、B 和 C 的向量，我们持有一个指向 B 内存位置的引用。现在我们移除 A，导致 B 和 C 向左移动。我们的引用会突然不再指向 B，而是指向 C！</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<blockquote>
+<p>这意味着我们不能持有对 row 的引用然后删除向量的一部分。所以我们首先直接读取 row 的长度，而不保留引用。然后我们通过从中移除一个元素来改变向量，接着我们创建对 row 的可变引用。</p>
+</blockquote>
+</blockquote>
 <p>本文链接:  <a href="https://zone.ivan-zhang.com.cn/p/a052054.html">https://zone.ivan-zhang.com.cn/p/a052054.html</a></p>
 
                 
