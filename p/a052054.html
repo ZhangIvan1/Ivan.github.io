@@ -27,7 +27,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://lsky.ivan-zhang.com.cn/i/2023/11/28/6565be6e6f35c.png">
 <meta property="article:published_time" content="2023-11-29T22:44:08.000Z">
-<meta property="article:modified_time" content="2023-12-05T15:21:18.113Z">
+<meta property="article:modified_time" content="2023-12-06T08:29:32.739Z">
 <meta property="article:author" content="Ivan Zhang">
 <meta property="article:tag" content="Rust">
 <meta property="article:tag" content="TextEditor">
@@ -272,7 +272,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          25k 字
+          26k 字
         
       </span>
     
@@ -283,7 +283,7 @@
         
         
         
-          210 分钟
+          216 分钟
         
       </span>
     
@@ -325,7 +325,7 @@
               <p class="note note-info">
                 
                   
-                    本文最后更新于：2023年12月5日 晚上
+                    本文最后更新于：2023年12月6日 下午
                   
                 
               </p>
@@ -422,6 +422,9 @@
 <p>这个变更主要与在某些位置访问行有关。我们之前使用的是安全的<code>get_mut</code>方法，即便没有内容可检索也不会引发<code>panic</code>，比如因为索引错误。我们直接在其上调用了<code>unwrap()</code>，这实际上否定了首先使用<code>get_mut</code>的好处。我们现在已经替换了这种做法，改为直接访问<code>self.rows</code>。我们在每个这样做的地方留下了一个<code>clippy</code>声明，以表明我们确实在那个时刻检查了我们仅仅在访问有效的索引。</p>
 <p>之前还有一个隐含的约定，那就是文档的长度始终对应于其中的行数，因此我们到处都在调用<code>self.len()</code>而不是<code>self.rows.len()</code>。如果我们的文档更长，所有在<code>self.row</code>上的操作都会失效。</p>
 <p>好了，现在还有两个<code>clippy</code>警告要解决。</p>
+<figure class="highlight diff"><figcaption><span>src/editor.rs</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs diff"><span class="hljs-meta">@@ -59,11 +59,10 @@</span> impl Editor &#123;<br>     pub fn default() -&gt; Self &#123;<br>         let args: Vec&lt;String&gt; = env::args().collect();<br>         let mut initial_status = String::from(&quot;HELP: Ctrl-S = save | Ctrl-Q = quit&quot;);<br><span class="hljs-deletion">-        let document = if args.len() &gt; 1 &#123;</span><br><span class="hljs-deletion">-            let file_name = &amp;args[1];</span><br><span class="hljs-deletion">-            let doc = Document::open(&amp;file_name);</span><br><span class="hljs-deletion">-            if doc.is_ok() &#123;</span><br><span class="hljs-deletion">-                doc.unwrap()</span><br><span class="hljs-addition">+        let document = if let Some(file_name) = args.get(1) &#123;</span><br><span class="hljs-addition">+            let doc = Document::open(file_name);</span><br><span class="hljs-addition">+            if let Ok(doc) = doc &#123;</span><br><span class="hljs-addition">+                doc</span><br>             &#125; else &#123;<br>                 initial_status = format!(&quot;ERRROR: Could not open file &#123;&#125;&quot;, file_name);<br>                 Document::default()<br></code></pre></td></tr></table></figure>
+<p>我们正在利用<code>get</code>函数的一个特点，正如上面讨论的，它仅在值存在时才返回值给我们，这消除了索引前进行检查的需要。然后，我们去除了<code>is_ok</code>以支持<code>if let</code>结构，以此来省去<code>unwrap</code>。</p>
+<p>现在，还有一些问题是<code>Clippy</code>检测不到的，我们不应该仅仅依赖<code>Clippy</code>进行开发。接下来我们将处理这些问题。</p>
 <p>本文链接:  <a href="https://zone.ivan-zhang.com.cn/p/a052054.html">https://zone.ivan-zhang.com.cn/p/a052054.html</a></p>
 
                 
@@ -489,7 +492,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2023年12月5日</div>
+          <div>2023年12月6日</div>
         </div>
       
       
