@@ -7,8 +7,8 @@
 
 <head>
   <meta charset="UTF-8">
-  <link rel="apple-touch-icon" sizes="76x76" href="https://lsky.ivan-zhang.com.cn/i/2023/10/15/652b853431f84.jpeg">
-  <link rel="icon" href="https://lsky.ivan-zhang.com.cn/i/2023/10/15/652b853431f84.jpeg">
+  <link rel="apple-touch-icon" sizes="76x76" href="https://lsky.ivanz.cc/i/2023/10/15/652b853431f84.jpeg">
+  <link rel="icon" href="https://lsky.ivan z/i/2023/10/15/652b853431f84.jpeg">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   
@@ -21,19 +21,19 @@
     <meta name="description" content="The arrangement of modules and dataflow in TCP implementation.  在Lab3中，需要实现一个TCPSender，主要有以下几个功能：  根据接收方的响应调整发送窗口； 发送SYN，FIN报文； 从ByteStream中读取、创建并发送新的TCPSegment； 跟踪已发送的Segment，直到被确认接收，必要时进行超时重传。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="CS144计算机网络Lab3: The TCP Sender">
-<meta property="og:url" content="https://zone.ivan-zhang.com.cn/p/785ad61c">
+<meta property="og:url" content="https://zone.ivanz.cc/p/785ad61c">
 <meta property="og:site_name" content="Ivan Zone">
 <meta property="og:description" content="The arrangement of modules and dataflow in TCP implementation.  在Lab3中，需要实现一个TCPSender，主要有以下几个功能：  根据接收方的响应调整发送窗口； 发送SYN，FIN报文； 从ByteStream中读取、创建并发送新的TCPSegment； 跟踪已发送的Segment，直到被确认接收，必要时进行超时重传。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://lsky.ivan-zhang.com.cn/i/2023/10/24/6537b1575e576.png">
+<meta property="og:image" content="http://lsky.ivanz.cc/i/2023/10/24/6537b1575e576.png">
 <meta property="article:published_time" content="2023-10-25T11:01:16.000Z">
-<meta property="article:modified_time" content="2023-11-24T09:12:17.704Z">
+<meta property="article:modified_time" content="2024-01-10T07:21:19.236Z">
 <meta property="article:author" content="Ivan Zhang">
 <meta property="article:tag" content="CS144">
 <meta property="article:tag" content="计算机网络">
 <meta property="article:tag" content="Lab">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://lsky.ivan-zhang.com.cn/i/2023/10/24/6537b1575e576.png">
+<meta name="twitter:image" content="http://lsky.ivanz.cc/i/2023/10/24/6537b1575e576.png">
   
   
     <meta name="referrer" content="no-referrer-when-downgrade">
@@ -83,7 +83,7 @@
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
     Fluid.ctx = Object.assign({}, Fluid.ctx)
-    var CONFIG = {"hostname":"zone.ivan-zhang.com.cn","root":"/","version":"1.9.5-a","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+    var CONFIG = {"hostname":"zone.ivanz.cc","root":"/","version":"1.9.5-a","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
 
     if (CONFIG.web_analytics.follow_dnt) {
       var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
@@ -244,7 +244,7 @@
   
 
 <div id="banner" class="banner" parallax=true
-     style="background: url('https://lsky.ivan-zhang.com.cn/i/2023/10/15/652ad1ee7547f.jpg') no-repeat center center; background-size: cover;">
+     style="background: url('https://lsky.ivanz.cc/i/2023/10/15/652ad1ee7547f.jpg') no-repeat center center; background-size: cover;">
   <div class="full-bg-img">
     <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
       <div class="banner-text text-center fade-in-up">
@@ -326,7 +326,7 @@
               <p class="note note-info">
                 
                   
-                    本文最后更新于：2023年11月24日 下午
+                    本文最后更新于：2024年1月10日 下午
                   
                 
               </p>
@@ -335,7 +335,7 @@
               <div class="markdown-body">
                 
                 <center>
-  <img src="http://lsky.ivan-zhang.com.cn/i/2023/10/15/652c095ff0876.png" srcset="/img/loading.gif" lazyload alt="CS144TCPSocket" style="zoom:25%;" /><br>
+  <img src="http://lsky.ivanz.cc/i/2023/10/15/652c095ff0876.png" srcset="/img/loading.gif" lazyload alt="CS144TCPSocket" style="zoom:25%;" /><br>
   <font color="DimGray" size="3">The arrangement of modules and dataflow in TCP implementation.</font>
 </center>
 <p>在<code>Lab3</code>中，需要实现一个<code>TCPSender</code>，主要有以下几个功能：</p>
@@ -382,7 +382,7 @@
 <h3 id="Evolution-of-the-TCP-sender">Evolution of the TCP sender</h3>
 <p>现在我们可以来实现一下<code>TCPSender</code>了。首先我们需要了解一下<code>Sender</code>的各种状态:</p>
 <center>
-  <img src="http://lsky.ivan-zhang.com.cn/i/2023/11/23/655f5c6b0ce89.png" srcset="/img/loading.gif" lazyload alt="EvolutionTCPSender" style="zoom:50%;" /><br>
+  <img src="http://lsky.ivanz.cc/i/2023/11/23/655f5c6b0ce89.png" srcset="/img/loading.gif" lazyload alt="EvolutionTCPSender" style="zoom:50%;" /><br>
   <font color="DimGray" size="3">Evolution of the TCP sender (as tested by the test suite).</font>
 </center>
 <p>在<code>CS144</code>中，各个状态能干的事情，其中在<code>CLOSED</code>和<code>SYN_ACKED</code>状态时，在发送SYN和FIN信号的同时也是可以携带数据的(不过我觉得现实中应该是不可以的)。除此之外，在<code>SYN_SENT</code>状态发完<code>SYN</code>还是可以继续发只有数据的<code>Segment</code>，分的不是很清楚。</p>
@@ -472,7 +472,7 @@
 <h4 id="consecutive-retransmissions"><code>consecutive_retransmissions()</code></h4>
 <p>返回<code>Timer</code>中记录的重传次数。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs C++"><span class="hljs-function"><span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> <span class="hljs-title">TCPSender::consecutive_retransmissions</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <br>  <span class="hljs-keyword">return</span> _timer.<span class="hljs-built_in">consecutive_retransmissions_times</span>(); <br>&#125;<br></code></pre></td></tr></table></figure>
-<p>本文链接:  <a href="https://zone.ivan-zhang.com.cn/p/785ad61c.html">https://zone.ivan-zhang.com.cn/p/785ad61c.html</a></p>
+<p>本文链接:  <a href="https://zone.ivanz.cc/p/785ad61c.html">https://zone.ivanz.cc/p/785ad61c.html</a></p>
 
                 
               </div>
@@ -523,7 +523,7 @@
   <div class="license-box my-3">
     <div class="license-title">
       <div>CS144计算机网络Lab3: The TCP Sender</div>
-      <div>https://zone.ivan-zhang.com.cn/p/785ad61c</div>
+      <div>https://zone.ivanz.cc/p/785ad61c</div>
     </div>
     <div class="license-meta">
       
@@ -541,7 +541,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2023年11月24日</div>
+          <div>2024年1月10日</div>
         </div>
       
       

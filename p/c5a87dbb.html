@@ -7,8 +7,8 @@
 
 <head>
   <meta charset="UTF-8">
-  <link rel="apple-touch-icon" sizes="76x76" href="https://lsky.ivan-zhang.com.cn/i/2023/10/15/652b853431f84.jpeg">
-  <link rel="icon" href="https://lsky.ivan-zhang.com.cn/i/2023/10/15/652b853431f84.jpeg">
+  <link rel="apple-touch-icon" sizes="76x76" href="https://lsky.ivanz.cc/i/2023/10/15/652b853431f84.jpeg">
+  <link rel="icon" href="https://lsky.ivan z/i/2023/10/15/652b853431f84.jpeg">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   
@@ -21,18 +21,18 @@
     <meta name="description" content="显示行 我们需要一个额外的数据结构：Document，代表用户当前正在编辑的文档，以及文档中的Row。 src&#x2F;document.rs1234567@@ -0,0 +1,6 @@+use crate::Row;++#[derive(Default)]+pub struct Document &amp;#123;+    rows: Vec&lt;Row&gt;,+&amp;#125; src&#x2F;editor.rs1">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Rust学习-制作一个文本编辑器: A Text Viewer">
-<meta property="og:url" content="https://zone.ivan-zhang.com.cn/p/c5a87dbb">
+<meta property="og:url" content="https://zone.ivanz.cc/p/c5a87dbb">
 <meta property="og:site_name" content="Ivan Zone">
 <meta property="og:description" content="显示行 我们需要一个额外的数据结构：Document，代表用户当前正在编辑的文档，以及文档中的Row。 src&#x2F;document.rs1234567@@ -0,0 +1,6 @@+use crate::Row;++#[derive(Default)]+pub struct Document &amp;#123;+    rows: Vec&lt;Row&gt;,+&amp;#125; src&#x2F;editor.rs1">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://lsky.ivan-zhang.com.cn/i/2023/11/28/6565be6e6f35c.png">
+<meta property="og:image" content="http://lsky.ivanz.cc/i/2023/11/28/6565be6e6f35c.png">
 <meta property="article:published_time" content="2023-11-24T06:52:58.000Z">
-<meta property="article:modified_time" content="2023-11-28T15:09:15.111Z">
+<meta property="article:modified_time" content="2024-01-10T07:21:19.235Z">
 <meta property="article:author" content="Ivan Zhang">
 <meta property="article:tag" content="Rust">
 <meta property="article:tag" content="TextEditor">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://lsky.ivan-zhang.com.cn/i/2023/11/28/6565be6e6f35c.png">
+<meta name="twitter:image" content="http://lsky.ivanz.cc/i/2023/11/28/6565be6e6f35c.png">
   
   
     <meta name="referrer" content="no-referrer-when-downgrade">
@@ -82,7 +82,7 @@
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
     Fluid.ctx = Object.assign({}, Fluid.ctx)
-    var CONFIG = {"hostname":"zone.ivan-zhang.com.cn","root":"/","version":"1.9.5-a","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+    var CONFIG = {"hostname":"zone.ivanz.cc","root":"/","version":"1.9.5-a","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
 
     if (CONFIG.web_analytics.follow_dnt) {
       var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
@@ -243,7 +243,7 @@
   
 
 <div id="banner" class="banner" parallax=true
-     style="background: url('https://lsky.ivan-zhang.com.cn/i/2023/10/15/652ad1ee7547f.jpg') no-repeat center center; background-size: cover;">
+     style="background: url('https://lsky.ivanz.cc/i/2023/10/15/652ad1ee7547f.jpg') no-repeat center center; background-size: cover;">
   <div class="full-bg-img">
     <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
       <div class="banner-text text-center fade-in-up">
@@ -325,7 +325,7 @@
               <p class="note note-info">
                 
                   
-                    本文最后更新于：2023年11月28日 晚上
+                    本文最后更新于：2024年1月10日 下午
                   
                 
               </p>
@@ -453,7 +453,7 @@
 <p>我们初始化<code>status_message</code>为一个帮助信息，显示键绑定。我们还利用这个机会设置状态消息为一个错误信息，当我们无法打开文件时。我们需要对打开文档的代码稍作调整，以便正确的文档被加载和正确的状态消息被设置。</p>
 <p>现在我们有了一个要显示的状态消息，我们可以修改<code>draw_message_bar()</code>函数。首先我们用<code>Terminal::clear_current_line()</code>清除消息栏。我们不需要为状态栏做这件事，因为我们总是在每次渲染时重写整行。然后我们确保消息适应屏幕宽度，并且只有当消息不超过5秒时才显示。这意味着即使我们不再显示旧的状态消息，我们也会保留它。这是可以的，因为那个数据结构本来就很小，而且不会随时间增长。</p>
 <p>现在当启动程序时，会在底部看到帮助信息，如果在显示5秒后按下一个键，它将消失。因为在每次按键后都会刷新屏幕。</p>
-<p>本文链接:  <a href="https://zone.ivan-zhang.com.cn/p/c5a87dbb.html">https://zone.ivan-zhang.com.cn/p/c5a87dbb.html</a></p>
+<p>本文链接:  <a href="https://zone.ivanz.cc/p/c5a87dbb.html">https://zone.ivanz.cc/p/c5a87dbb.html</a></p>
 
                 
               </div>
@@ -502,7 +502,7 @@
   <div class="license-box my-3">
     <div class="license-title">
       <div>Rust学习-制作一个文本编辑器: A Text Viewer</div>
-      <div>https://zone.ivan-zhang.com.cn/p/c5a87dbb</div>
+      <div>https://zone.ivanz.cc/p/c5a87dbb</div>
     </div>
     <div class="license-meta">
       
@@ -520,7 +520,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2023年11月28日</div>
+          <div>2024年1月10日</div>
         </div>
       
       

@@ -7,8 +7,8 @@
 
 <head>
   <meta charset="UTF-8">
-  <link rel="apple-touch-icon" sizes="76x76" href="https://lsky.ivan-zhang.com.cn/i/2023/10/15/652b853431f84.jpeg">
-  <link rel="icon" href="https://lsky.ivan-zhang.com.cn/i/2023/10/15/652b853431f84.jpeg">
+  <link rel="apple-touch-icon" sizes="76x76" href="https://lsky.ivanz.cc/i/2023/10/15/652b853431f84.jpeg">
+  <link rel="icon" href="https://lsky.ivan z/i/2023/10/15/652b853431f84.jpeg">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   
@@ -21,19 +21,19 @@
     <meta name="description" content="热身分为三个部分，第一部分要求用telnet工具来发送一些简单的http请求，第二部分是写一个简单的webget应用模拟使用telnet是的操作，第三部分是完善一个ByteStream来实现更底层的socket写入读取等操作 第一部分 - Networking by hand A. Fetch a Web page 通过在浏览器中访问http:&#x2F;&#x2F;cs144.keithw.org&#x2F;hello，我们">
 <meta property="og:type" content="article">
 <meta property="og:title" content="CS144计算机网络Lab0: Networking Warmup">
-<meta property="og:url" content="https://zone.ivan-zhang.com.cn/p/30fba476">
+<meta property="og:url" content="https://zone.ivanz.cc/p/30fba476">
 <meta property="og:site_name" content="Ivan Zone">
 <meta property="og:description" content="热身分为三个部分，第一部分要求用telnet工具来发送一些简单的http请求，第二部分是写一个简单的webget应用模拟使用telnet是的操作，第三部分是完善一个ByteStream来实现更底层的socket写入读取等操作 第一部分 - Networking by hand A. Fetch a Web page 通过在浏览器中访问http:&#x2F;&#x2F;cs144.keithw.org&#x2F;hello，我们">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://lsky.ivan-zhang.com.cn/i/2023/10/24/6537b1575e576.png">
+<meta property="og:image" content="http://lsky.ivanz.cc/i/2023/10/24/6537b1575e576.png">
 <meta property="article:published_time" content="2023-10-14T09:36:47.000Z">
-<meta property="article:modified_time" content="2023-11-20T07:24:25.051Z">
+<meta property="article:modified_time" content="2024-01-10T07:21:19.235Z">
 <meta property="article:author" content="Ivan Zhang">
 <meta property="article:tag" content="CS144">
 <meta property="article:tag" content="计算机网络">
 <meta property="article:tag" content="Lab">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://lsky.ivan-zhang.com.cn/i/2023/10/24/6537b1575e576.png">
+<meta name="twitter:image" content="http://lsky.ivanz.cc/i/2023/10/24/6537b1575e576.png">
   
   
     <meta name="referrer" content="no-referrer-when-downgrade">
@@ -83,7 +83,7 @@
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
     Fluid.ctx = Object.assign({}, Fluid.ctx)
-    var CONFIG = {"hostname":"zone.ivan-zhang.com.cn","root":"/","version":"1.9.5-a","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+    var CONFIG = {"hostname":"zone.ivanz.cc","root":"/","version":"1.9.5-a","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
 
     if (CONFIG.web_analytics.follow_dnt) {
       var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
@@ -244,7 +244,7 @@
   
 
 <div id="banner" class="banner" parallax=true
-     style="background: url('https://lsky.ivan-zhang.com.cn/i/2023/10/15/652ad1ee7547f.jpg') no-repeat center center; background-size: cover;">
+     style="background: url('https://lsky.ivanz.cc/i/2023/10/15/652ad1ee7547f.jpg') no-repeat center center; background-size: cover;">
   <div class="full-bg-img">
     <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
       <div class="banner-text text-center fade-in-up">
@@ -326,7 +326,7 @@
               <p class="note note-info">
                 
                   
-                    本文最后更新于：2023年11月20日 下午
+                    本文最后更新于：2024年1月10日 下午
                   
                 
               </p>
@@ -392,7 +392,7 @@
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><code class="hljs c++">ByteStream::<span class="hljs-built_in">ByteStream</span>(<span class="hljs-type">const</span> <span class="hljs-type">size_t</span> capacity) : <span class="hljs-built_in">string_buffer</span>(<span class="hljs-string">&quot;&quot;</span>), _buffer_size(capacity), _bytes_written(<span class="hljs-number">0</span>), _bytes_read(<span class="hljs-number">0</span>) &#123;&#125;<br><br><span class="hljs-function"><span class="hljs-type">size_t</span> <span class="hljs-title">ByteStream::write</span><span class="hljs-params">(<span class="hljs-type">const</span> string &amp;data)</span> </span>&#123;<br><span class="hljs-comment">//    DUMMY_CODE(data);</span><br>    <span class="hljs-type">size_t</span> write_cnt = <span class="hljs-built_in">min</span>(<span class="hljs-built_in">remaining_capacity</span>(), data.<span class="hljs-built_in">length</span>());<br>    string_buffer += std::<span class="hljs-built_in">move</span>(data.<span class="hljs-built_in">substr</span>(<span class="hljs-number">0</span>,write_cnt));<br>    _bytes_written += write_cnt;<br><br>    <span class="hljs-keyword">return</span> write_cnt;<br>&#125;<br><br><span class="hljs-comment">//! \param[in] len bytes will be copied from the output side of the buffer</span><br><span class="hljs-function">string <span class="hljs-title">ByteStream::peek_output</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">size_t</span> len)</span> <span class="hljs-type">const</span> </span>&#123;<br><span class="hljs-comment">//    DUMMY_CODE(len);</span><br>    <span class="hljs-keyword">return</span> string_buffer.<span class="hljs-built_in">substr</span>(<span class="hljs-number">0</span>,len);<br>&#125;<br><br><span class="hljs-comment">//! \param[in] len bytes will be removed from the output side of the buffer</span><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">ByteStream::pop_output</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">size_t</span> len)</span> </span>&#123;<br><span class="hljs-comment">//    DUMMY_CODE(len);</span><br>    string_buffer.<span class="hljs-built_in">erase</span>(<span class="hljs-number">0</span>,len);<br>    _bytes_read+=len;<br>&#125;<br><br><span class="hljs-comment">//! Read (i.e., copy and then pop) the next &quot;len&quot; bytes of the stream</span><br><span class="hljs-comment">//! \param[in] len bytes will be popped and returned</span><br><span class="hljs-comment">//! \returns a string</span><br><span class="hljs-function">std::string <span class="hljs-title">ByteStream::read</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">size_t</span> len)</span> </span>&#123;<br>    <span class="hljs-comment">//    DUMMY_CODE(len);</span><br>    std::string copied_str = <span class="hljs-built_in">peek_output</span>(len);<br>    <span class="hljs-built_in">pop_output</span>(len);<br><br>    <span class="hljs-keyword">return</span> copied_str;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">ByteStream::end_input</span><span class="hljs-params">()</span> </span>&#123; _is_input_ended = <span class="hljs-literal">true</span>; &#125;<br><br><span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">ByteStream::input_ended</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> _is_input_ended; &#125;<br><br><span class="hljs-function"><span class="hljs-type">size_t</span> <span class="hljs-title">ByteStream::buffer_size</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> string_buffer.<span class="hljs-built_in">length</span>(); &#125;<br><br><span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">ByteStream::buffer_empty</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> string_buffer.<span class="hljs-built_in">empty</span>(); &#125;<br><br><span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">ByteStream::eof</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> _is_input_ended &amp;&amp; <span class="hljs-built_in">buffer_empty</span>(); &#125;<br><br><span class="hljs-function"><span class="hljs-type">size_t</span> <span class="hljs-title">ByteStream::bytes_written</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> _bytes_written; &#125;<br><br><span class="hljs-function"><span class="hljs-type">size_t</span> <span class="hljs-title">ByteStream::bytes_read</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> _bytes_read; &#125;<br><br><span class="hljs-function"><span class="hljs-type">size_t</span> <span class="hljs-title">ByteStream::remaining_capacity</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> _buffer_size - <span class="hljs-built_in">buffer_size</span>(); &#125;<br></code></pre></td></tr></table></figure>
 <p>在一开始做这个实验的时候，完全不知道需要干什么，之前学的C++还有面向对象的知识都忘了不少。实际上只需要按照每个模块的功能一步步写+<code>debug</code>就好了。</p>
 <p>在测试的时候经常会出现<code>The ByteStream should have had bytes_written equal to 0 but instead it was 1</code>这样的错误，后面发现是我在定义<code>string_buffer</code>的时候把它初始化为了<code>&quot; &quot;</code>，而正常应该是为<code>空</code>。</p>
-<p>本文链接:  <a href="https://zone.ivan-zhang.com.cn/p/30fba476.html">https://zone.ivan-zhang.com.cn/p/30fba476.html</a></p>
+<p>本文链接:  <a href="https://zone.ivanz.cc/p/30fba476.html">https://zone.ivanz.cc/p/30fba476.html</a></p>
 
                 
               </div>
@@ -443,7 +443,7 @@
   <div class="license-box my-3">
     <div class="license-title">
       <div>CS144计算机网络Lab0: Networking Warmup</div>
-      <div>https://zone.ivan-zhang.com.cn/p/30fba476</div>
+      <div>https://zone.ivanz.cc/p/30fba476</div>
     </div>
     <div class="license-meta">
       
@@ -461,7 +461,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2023年11月20日</div>
+          <div>2024年1月10日</div>
         </div>
       
       

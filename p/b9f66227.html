@@ -7,8 +7,8 @@
 
 <head>
   <meta charset="UTF-8">
-  <link rel="apple-touch-icon" sizes="76x76" href="https://lsky.ivan-zhang.com.cn/i/2023/10/15/652b853431f84.jpeg">
-  <link rel="icon" href="https://lsky.ivan-zhang.com.cn/i/2023/10/15/652b853431f84.jpeg">
+  <link rel="apple-touch-icon" sizes="76x76" href="https://lsky.ivanz.cc/i/2023/10/15/652b853431f84.jpeg">
+  <link rel="icon" href="https://lsky.ivan z/i/2023/10/15/652b853431f84.jpeg">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   
@@ -21,19 +21,19 @@
     <meta name="description" content="The arrangement of modules and dataflow in TCP implementation.  &#96;Lab2&#96;要求实现一个&#96;TCPReceiver&#96;，包含以下几个功能：  接收TCPSegment； 调用字节流重组器； 向发送方发送相应确认信号； 流量控制。  这次的实验主要分为Translating between 64-bit indexes and">
 <meta property="og:type" content="article">
 <meta property="og:title" content="CS144计算机网络Lab2: The TCP Receiver">
-<meta property="og:url" content="https://zone.ivan-zhang.com.cn/p/b9f66227">
+<meta property="og:url" content="https://zone.ivanz.cc/p/b9f66227">
 <meta property="og:site_name" content="Ivan Zone">
 <meta property="og:description" content="The arrangement of modules and dataflow in TCP implementation.  &#96;Lab2&#96;要求实现一个&#96;TCPReceiver&#96;，包含以下几个功能：  接收TCPSegment； 调用字节流重组器； 向发送方发送相应确认信号； 流量控制。  这次的实验主要分为Translating between 64-bit indexes and">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://lsky.ivan-zhang.com.cn/i/2023/10/24/6537b1575e576.png">
+<meta property="og:image" content="http://lsky.ivanz.cc/i/2023/10/24/6537b1575e576.png">
 <meta property="article:published_time" content="2023-10-18T16:24:09.000Z">
-<meta property="article:modified_time" content="2023-11-16T06:48:07.928Z">
+<meta property="article:modified_time" content="2024-01-10T07:21:19.239Z">
 <meta property="article:author" content="Ivan Zhang">
 <meta property="article:tag" content="CS144">
 <meta property="article:tag" content="计算机网络">
 <meta property="article:tag" content="Lab">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://lsky.ivan-zhang.com.cn/i/2023/10/24/6537b1575e576.png">
+<meta name="twitter:image" content="http://lsky.ivanz.cc/i/2023/10/24/6537b1575e576.png">
   
   
     <meta name="referrer" content="no-referrer-when-downgrade">
@@ -83,7 +83,7 @@
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
     Fluid.ctx = Object.assign({}, Fluid.ctx)
-    var CONFIG = {"hostname":"zone.ivan-zhang.com.cn","root":"/","version":"1.9.5-a","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+    var CONFIG = {"hostname":"zone.ivanz.cc","root":"/","version":"1.9.5-a","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
 
     if (CONFIG.web_analytics.follow_dnt) {
       var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
@@ -244,7 +244,7 @@
   
 
 <div id="banner" class="banner" parallax=true
-     style="background: url('https://lsky.ivan-zhang.com.cn/i/2023/10/15/652ad1ee7547f.jpg') no-repeat center center; background-size: cover;">
+     style="background: url('https://lsky.ivanz.cc/i/2023/10/15/652ad1ee7547f.jpg') no-repeat center center; background-size: cover;">
   <div class="full-bg-img">
     <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
       <div class="banner-text text-center fade-in-up">
@@ -326,7 +326,7 @@
               <p class="note note-info">
                 
                   
-                    本文最后更新于：2023年11月16日 下午
+                    本文最后更新于：2024年1月10日 下午
                   
                 
               </p>
@@ -335,7 +335,7 @@
               <div class="markdown-body">
                 
                 <center>
-  <img src="http://lsky.ivan-zhang.com.cn/i/2023/10/15/652c095ff0876.png" srcset="/img/loading.gif" lazyload alt="CS144TCPSocket" style="zoom:25%;" /><br>
+  <img src="http://lsky.ivanz.cc/i/2023/10/15/652c095ff0876.png" srcset="/img/loading.gif" lazyload alt="CS144TCPSocket" style="zoom:25%;" /><br>
   <font color="DimGray" size="3">The arrangement of modules and dataflow in TCP implementation.</font>
 </center>
 `Lab2`要求实现一个`TCPReceiver`，包含以下几个功能：
@@ -347,7 +347,7 @@
 </ul>
 <p>这次的实验主要分为<code>Translating between 64-bit indexes and 32-bit seqnos</code>和<code>Implementing the TCP receiver</code>两个部分。前者是学习实现<code>TCPSegment</code>中的索引方式；后者是实现<code>TCPReceiver</code>的主要功能。</p>
 <h2 id="A-Translating-between-64-bit-indexes-and-32-bit-seqnos">A. Translating between 64-bit indexes and 32-bit seqnos</h2>
-<p>这一部分需要实现<code>TCP</code>中表示索引的方式，在<a href="https://zone.ivan-zhang.com.cn/posts/5858.html"><code>Lab1</code></a>中我们实现了<code>StreamReassembler</code>，其中使用的<code>index</code>就是一个<code>64-bit</code> 并从<code>0</code>开始计数的<code>stream index</code>。然而<code>TCP</code>的首部空间寸土寸金，直接占用<code>64-bit</code>为免也太奢侈了，所以在实践中，通常使用<code>32-bit</code>的<code>sequence number</code>或<code>seqno</code>表示。这样一个用低位数据来表示高位数据的方法自然而然地又了了以下几个挑战：</p>
+<p>这一部分需要实现<code>TCP</code>中表示索引的方式，在<a href="https://zone.ivanz.cc/posts/5858.html"><code>Lab1</code></a>中我们实现了<code>StreamReassembler</code>，其中使用的<code>index</code>就是一个<code>64-bit</code> 并从<code>0</code>开始计数的<code>stream index</code>。然而<code>TCP</code>的首部空间寸土寸金，直接占用<code>64-bit</code>为免也太奢侈了，所以在实践中，通常使用<code>32-bit</code>的<code>sequence number</code>或<code>seqno</code>表示。这样一个用低位数据来表示高位数据的方法自然而然地又了了以下几个挑战：</p>
 <ul>
 <li>当<code>32-bit</code>空间用完<code>(到达2^32-1)</code>后，需要对其进行重置，从<code>0</code>开始重新计数，即<code>(mod 2^32)</code>；</li>
 <li>为了避免以前连接中旧数据包造成混淆，在<code>TPC</code>连接建立阶段需要随机确定一个<code>32-bit</code>的初始值即<code>ISN(Initial Sequence Number)</code>，尽量保证序列号<strong>不可被预判</strong>或<strong>与之前重复</strong>；</li>
@@ -355,11 +355,11 @@
 </ul>
 <p>在TCP中，索引有以下三种：</p>
 <center>
-  <img src="http://lsky.ivan-zhang.com.cn/i/2023/10/21/6532a9e34f0ef.png" srcset="/img/loading.gif" lazyload alt="TCPIndex-Example" style="zoom:40%;" />
+  <img src="http://lsky.ivanz.cc/i/2023/10/21/6532a9e34f0ef.png" srcset="/img/loading.gif" lazyload alt="TCPIndex-Example" style="zoom:40%;" />
   <br>
   <font color="DimGray" size="3">An Example of Bitstream "cat".</font>
   <br>
-  <img src="http://lsky.ivan-zhang.com.cn/i/2023/10/21/6532aa42d64cf.png" srcset="/img/loading.gif" lazyload alt="TCPIndex" style="zoom:40%;" />
+  <img src="http://lsky.ivanz.cc/i/2023/10/21/6532aa42d64cf.png" srcset="/img/loading.gif" lazyload alt="TCPIndex" style="zoom:40%;" />
   <br>
   <font color="DimGray" size="3">Three Different Types of Indexing Involved in TCP.</font>
 </center>
@@ -384,7 +384,7 @@
 <p><strong>那么如何改进，分析一下：</strong></p>
 <p>前面的方案是通过循环累加确定<code>checkpoint</code>附近的<code>absolute seqno</code>，这个流程可以通过取模+除法操作替代，这就意味着计算未接近<code>checkpoint</code>的<code>32-bit</code>区间是毫无意义的，我们只需要考虑<code>checkpoint</code>所在的当前区间以及其前后区间即可。</p>
 <center>
-  <img src="http://lsky.ivan-zhang.com.cn/i/2023/10/24/653789844035c.png" srcset="/img/loading.gif" lazyload alt="区间" style="zoom:17%;" />
+  <img src="http://lsky.ivanz.cc/i/2023/10/24/653789844035c.png" srcset="/img/loading.gif" lazyload alt="区间" style="zoom:17%;" />
   <br>
   <font color="DimGray" size="3">当前以及其前后32bit区间.</font>
 </center>
@@ -409,7 +409,7 @@
 <h2 id="B-Implementing-the-TCP-receiver">B. Implementing the TCP receiver</h2>
 <p><code>TCPReceiver</code>在运行过程中会收到这样格式的<code>TCPSegment</code>：</p>
 <center>
-  <img src="http://lsky.ivan-zhang.com.cn/i/2023/10/23/6535f5f09de27.png" srcset="/img/loading.gif" lazyload alt="TCPSegment" style="zoom:75%;" />
+  <img src="http://lsky.ivanz.cc/i/2023/10/23/6535f5f09de27.png" srcset="/img/loading.gif" lazyload alt="TCPSegment" style="zoom:75%;" />
   <br>
   <font color="DimGray" size="3">TCPSegment.</font>
 </center>
@@ -434,7 +434,7 @@
 </ul>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs C++"><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">TCPReceiver::segment_received</span><span class="hljs-params">(<span class="hljs-type">const</span> TCPSegment &amp;seg)</span> </span>&#123;<br>    <span class="hljs-comment">//    DUMMY_CODE(seg);</span><br>    <span class="hljs-keyword">if</span> (seg.<span class="hljs-built_in">header</span>().syn &amp;&amp; !_syn) &#123;<br>        _isn = seg.<span class="hljs-built_in">header</span>().seqno;<br>        _syn = seg.<span class="hljs-built_in">header</span>().syn;<br>    &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (!_syn) <span class="hljs-keyword">return</span>;<br>    _reassembler.<span class="hljs-built_in">push_substring</span>(seg.<span class="hljs-built_in">payload</span>().<span class="hljs-built_in">copy</span>(),<br>                                <span class="hljs-built_in">unwrap</span>(seg.<span class="hljs-built_in">header</span>().seqno, _isn, _reassembler.<span class="hljs-built_in">stream_out</span>().<span class="hljs-built_in">bytes_written</span>() + <span class="hljs-number">1</span>) - <span class="hljs-number">1</span> +<br>                                    seg.<span class="hljs-built_in">header</span>().syn,<br>                                seg.<span class="hljs-built_in">header</span>().fin);<br>    <span class="hljs-keyword">if</span> (seg.<span class="hljs-built_in">header</span>().fin) _fin = seg.<span class="hljs-built_in">header</span>().fin;<br>&#125;<br><br><span class="hljs-function">optional&lt;WrappingInt32&gt; <span class="hljs-title">TCPReceiver::ackno</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123;<br>    <span class="hljs-keyword">return</span> _syn ? optional&lt;WrappingInt32&gt;&#123;<span class="hljs-built_in">wrap</span>(_reassembler.<span class="hljs-built_in">stream_out</span>().<span class="hljs-built_in">bytes_written</span>() + _syn + (_fin &amp;&amp; _reassembler.<span class="hljs-built_in">empty</span>()), _isn)&#125;<br>                : <span class="hljs-literal">nullopt</span>;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">size_t</span> <span class="hljs-title">TCPReceiver::window_size</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> _capacity - _reassembler.<span class="hljs-built_in">stream_out</span>().<span class="hljs-built_in">buffer_size</span>(); &#125;<br></code></pre></td></tr></table></figure>
 <p>在写<code>segment_received</code>的时候，在<code>recv_specal</code>这个测试中卡了好久，这里面设计了很多<code>syn</code>、<code>fin</code>与数据结合的<code>Segment</code>，需要特别注意下。</p>
-<p>本文链接:  <a href="https://zone.ivan-zhang.com.cn/p/b9f66227.html">https://zone.ivan-zhang.com.cn/p/b9f66227.html</a></p>
+<p>本文链接:  <a href="https://zone.ivanz.cc/p/b9f66227.html">https://zone.ivanz.cc/p/b9f66227.html</a></p>
 
                 
               </div>
@@ -485,7 +485,7 @@
   <div class="license-box my-3">
     <div class="license-title">
       <div>CS144计算机网络Lab2: The TCP Receiver</div>
-      <div>https://zone.ivan-zhang.com.cn/p/b9f66227</div>
+      <div>https://zone.ivanz.cc/p/b9f66227</div>
     </div>
     <div class="license-meta">
       
@@ -503,7 +503,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2023年11月16日</div>
+          <div>2024年1月10日</div>
         </div>
       
       

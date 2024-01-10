@@ -7,8 +7,8 @@
 
 <head>
   <meta charset="UTF-8">
-  <link rel="apple-touch-icon" sizes="76x76" href="https://lsky.ivan-zhang.com.cn/i/2023/10/15/652b853431f84.jpeg">
-  <link rel="icon" href="https://lsky.ivan-zhang.com.cn/i/2023/10/15/652b853431f84.jpeg">
+  <link rel="apple-touch-icon" sizes="76x76" href="https://lsky.ivanz.cc/i/2023/10/15/652b853431f84.jpeg">
+  <link rel="icon" href="https://lsky.ivan z/i/2023/10/15/652b853431f84.jpeg">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   
@@ -21,18 +21,18 @@
     <meta name="description" content="读取用户的输入 现在来尝试读取用户的输入操作，main.rs如下： src&#x2F;main.rs12345678use std::io::&amp;#123;self, Read&amp;#125;;fn main() &amp;#123;    for b in io::stdin().bytes()&amp;#123;        let c &#x3D; b.unwrap() as char;        println!(&amp;quot">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Rust学习-制作一个文本编辑器: Reading User Input">
-<meta property="og:url" content="https://zone.ivan-zhang.com.cn/p/8e0787d5">
+<meta property="og:url" content="https://zone.ivanz.cc/p/8e0787d5">
 <meta property="og:site_name" content="Ivan Zone">
 <meta property="og:description" content="读取用户的输入 现在来尝试读取用户的输入操作，main.rs如下： src&#x2F;main.rs12345678use std::io::&amp;#123;self, Read&amp;#125;;fn main() &amp;#123;    for b in io::stdin().bytes()&amp;#123;        let c &#x3D; b.unwrap() as char;        println!(&amp;quot">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://lsky.ivan-zhang.com.cn/i/2023/11/11/654f341780bd6.png">
+<meta property="og:image" content="http://lsky.ivanz.cc/i/2023/11/11/654f341780bd6.png">
 <meta property="article:published_time" content="2023-11-10T09:51:47.000Z">
-<meta property="article:modified_time" content="2023-11-16T07:04:19.493Z">
+<meta property="article:modified_time" content="2024-01-10T07:21:19.244Z">
 <meta property="article:author" content="Ivan Zhang">
 <meta property="article:tag" content="Rust">
 <meta property="article:tag" content="TextEditor">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://lsky.ivan-zhang.com.cn/i/2023/11/11/654f341780bd6.png">
+<meta name="twitter:image" content="http://lsky.ivanz.cc/i/2023/11/11/654f341780bd6.png">
   
   
     <meta name="referrer" content="no-referrer-when-downgrade">
@@ -82,7 +82,7 @@
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
     Fluid.ctx = Object.assign({}, Fluid.ctx)
-    var CONFIG = {"hostname":"zone.ivan-zhang.com.cn","root":"/","version":"1.9.5-a","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+    var CONFIG = {"hostname":"zone.ivanz.cc","root":"/","version":"1.9.5-a","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
 
     if (CONFIG.web_analytics.follow_dnt) {
       var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
@@ -243,7 +243,7 @@
   
 
 <div id="banner" class="banner" parallax=true
-     style="background: url('https://lsky.ivan-zhang.com.cn/i/2023/10/15/652ad1ee7547f.jpg') no-repeat center center; background-size: cover;">
+     style="background: url('https://lsky.ivanz.cc/i/2023/10/15/652ad1ee7547f.jpg') no-repeat center center; background-size: cover;">
   <div class="full-bg-img">
     <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
       <div class="banner-text text-center fade-in-up">
@@ -325,7 +325,7 @@
               <p class="note note-info">
                 
                   
-                    本文最后更新于：2023年11月16日 下午
+                    本文最后更新于：2024年1月10日 下午
                   
                 
               </p>
@@ -378,7 +378,7 @@
 <p>我们希望在错误发生时自行控制程序崩溃，而不是让Rust直接触发<code>panic</code>，因为后续我们想在程序崩溃前清除屏幕，避免给用户留下未完成绘制的输入信息。目前，我们只需检查错误然后调用<code>die</code>函数，这个函数会替我们执行<code>panic</code>。</p>
 <p>我们通过枚举（<code>match</code>）来实现这个流程，<code>match</code>可以当成一个增强版的<code>if-then-else</code>。由它处理变量<code>b</code>，这个变量要么包含我们想要的值，这个值被<code>Ok</code>包装，要么包含一个错误，这个错误被<code>Err</code>包装：</p>
 <figure class="highlight rust"><figcaption><span>src/main.rs</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-keyword">for</span> <span class="hljs-variable">b</span> <span class="hljs-keyword">in</span> io::<span class="hljs-title function_ invoke__">stdin</span>().<span class="hljs-title function_ invoke__">bytes</span>()&#123;<br>    <span class="hljs-keyword">match</span> b&#123;<br>        <span class="hljs-title function_ invoke__">Ok</span>(b) =&gt; &#123;<br>            <span class="hljs-keyword">let</span> <span class="hljs-variable">c</span> = b <span class="hljs-keyword">as</span> <span class="hljs-type">char</span>;<br>            <span class="hljs-keyword">if</span> c.<span class="hljs-title function_ invoke__">is_control</span>() &#123;<br>                <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;&#123;:?&#125; \r&quot;</span>, b);<br>            &#125; <span class="hljs-keyword">else</span> &#123;<br>                <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;&#123;:?&#125; (&#123;&#125;)\r&quot;</span>, b, c);<br>            &#125;<br>            <span class="hljs-keyword">if</span> b == <span class="hljs-title function_ invoke__">to_ctrl_byte</span>(<span class="hljs-string">&#x27;q&#x27;</span>)&#123;<br>                    <span class="hljs-keyword">break</span>;<br>            &#125;<br>        &#125;<br>        <span class="hljs-title function_ invoke__">Err</span>(err) =&gt; <span class="hljs-title function_ invoke__">die</span>(err),<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
-<p>本文链接:  <a href="https://zone.ivan-zhang.com.cn/p/8e0787d5.html">https://zone.ivan-zhang.com.cn/p/8e0787d5.html</a></p>
+<p>本文链接:  <a href="https://zone.ivanz.cc/p/8e0787d5.html">https://zone.ivanz.cc/p/8e0787d5.html</a></p>
 
                 
               </div>
@@ -427,7 +427,7 @@
   <div class="license-box my-3">
     <div class="license-title">
       <div>Rust学习-制作一个文本编辑器: Reading User Input</div>
-      <div>https://zone.ivan-zhang.com.cn/p/8e0787d5</div>
+      <div>https://zone.ivanz.cc/p/8e0787d5</div>
     </div>
     <div class="license-meta">
       
@@ -445,7 +445,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2023年11月16日</div>
+          <div>2024年1月10日</div>
         </div>
       
       

@@ -7,8 +7,8 @@
 
 <head>
   <meta charset="UTF-8">
-  <link rel="apple-touch-icon" sizes="76x76" href="https://lsky.ivan-zhang.com.cn/i/2023/10/15/652b853431f84.jpeg">
-  <link rel="icon" href="https://lsky.ivan-zhang.com.cn/i/2023/10/15/652b853431f84.jpeg">
+  <link rel="apple-touch-icon" sizes="76x76" href="https://lsky.ivanz.cc/i/2023/10/15/652b853431f84.jpeg">
+  <link rel="icon" href="https://lsky.ivan z/i/2023/10/15/652b853431f84.jpeg">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   
@@ -21,18 +21,18 @@
     <meta name="description" content="使用键代替Byte 在之前的步骤中，我们直接操作字节。然而，本着“不重复造轮子”的原则，我们可以使用各种库函数已经实现的方法。termion就已经提供了这个方法，它可以将单个字节组合成按键输入，并传递给我们： src&#x2F;main.rs1234567891011121314151617181920212223242526272829use std::io::&amp;#123;self, stdout&amp;#12">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Rust学习-制作一个文本编辑器: Raw Input And Output">
-<meta property="og:url" content="https://zone.ivan-zhang.com.cn/p/156e55dd">
+<meta property="og:url" content="https://zone.ivanz.cc/p/156e55dd">
 <meta property="og:site_name" content="Ivan Zone">
 <meta property="og:description" content="使用键代替Byte 在之前的步骤中，我们直接操作字节。然而，本着“不重复造轮子”的原则，我们可以使用各种库函数已经实现的方法。termion就已经提供了这个方法，它可以将单个字节组合成按键输入，并传递给我们： src&#x2F;main.rs1234567891011121314151617181920212223242526272829use std::io::&amp;#123;self, stdout&amp;#12">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://lsky.ivan-zhang.com.cn/i/2023/11/20/655b09fb7859c.png">
+<meta property="og:image" content="http://lsky.ivanz.cc/i/2023/11/20/655b09fb7859c.png">
 <meta property="article:published_time" content="2023-11-14T22:52:50.000Z">
-<meta property="article:modified_time" content="2023-11-20T07:26:08.159Z">
+<meta property="article:modified_time" content="2024-01-10T07:21:19.241Z">
 <meta property="article:author" content="Ivan Zhang">
 <meta property="article:tag" content="Rust">
 <meta property="article:tag" content="TextEditor">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://lsky.ivan-zhang.com.cn/i/2023/11/20/655b09fb7859c.png">
+<meta name="twitter:image" content="http://lsky.ivanz.cc/i/2023/11/20/655b09fb7859c.png">
   
   
     <meta name="referrer" content="no-referrer-when-downgrade">
@@ -82,7 +82,7 @@
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
     Fluid.ctx = Object.assign({}, Fluid.ctx)
-    var CONFIG = {"hostname":"zone.ivan-zhang.com.cn","root":"/","version":"1.9.5-a","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+    var CONFIG = {"hostname":"zone.ivanz.cc","root":"/","version":"1.9.5-a","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
 
     if (CONFIG.web_analytics.follow_dnt) {
       var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
@@ -243,7 +243,7 @@
   
 
 <div id="banner" class="banner" parallax=true
-     style="background: url('https://lsky.ivan-zhang.com.cn/i/2023/10/15/652ad1ee7547f.jpg') no-repeat center center; background-size: cover;">
+     style="background: url('https://lsky.ivanz.cc/i/2023/10/15/652ad1ee7547f.jpg') no-repeat center center; background-size: cover;">
   <div class="full-bg-img">
     <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
       <div class="banner-text text-center fade-in-up">
@@ -325,7 +325,7 @@
               <p class="note note-info">
                 
                   
-                    本文最后更新于：2023年11月20日 下午
+                    本文最后更新于：2024年1月10日 下午
                   
                 
               </p>
@@ -458,7 +458,7 @@
 <h2 id="映射功能键">映射功能键</h2>
 <p>为了完善我们的低级终端代码，我们需要检测一些更特殊的按键操作。我们将映射<code>Page Up</code>、<code>Page Down</code>、<code>Home</code>和<code>End</code>键，以便分别将光标定位到屏幕的顶部或底部，或是行的开头或末尾。</p>
 <figure class="highlight diff"><figcaption><span>src/editor.rs</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs diff"><span class="hljs-meta">@@ -55,7 +55,14 @@</span> impl Editor &#123;<br>         let pressed_key = Terminal::read_key()?;<br>         match pressed_key &#123;<br>             Key::Ctrl(&#x27;q&#x27;) =&gt; self.should_quit = true,<br><span class="hljs-deletion">-            Key::Up | Key::Down | Key::Left | Key::Right =&gt; self.move_cursor(pressed_key),</span><br><span class="hljs-addition">+            Key::Up</span><br><span class="hljs-addition">+            | Key::Down</span><br><span class="hljs-addition">+            | Key::Left</span><br><span class="hljs-addition">+            | Key::Right</span><br><span class="hljs-addition">+            | Key::Home</span><br><span class="hljs-addition">+            | Key::End</span><br><span class="hljs-addition">+            | Key::PageUp</span><br><span class="hljs-addition">+            | Key::PageDown =&gt; self.move_cursor(pressed_key),</span><br>             _ =&gt; (),<br>         &#125;<br>         Ok(())<br><span class="hljs-meta">@@ -79,6 +86,10 @@</span> impl Editor &#123;<br>                     x = x.saturating_add(1);<br>                 &#125;<br>             &#125;<br><span class="hljs-addition">+            Key::Home =&gt; x = 0,</span><br><span class="hljs-addition">+            Key::End =&gt; x = width,</span><br><span class="hljs-addition">+            Key::PageUp =&gt; y = 0,</span><br><span class="hljs-addition">+            Key::PageDown =&gt; y = height,</span><br>             _ =&gt; (),<br>         &#125;<br>         self.cursor_position = Position &#123; x, y &#125;<br></code></pre></td></tr></table></figure>
-<p>本文链接:  <a href="https://zone.ivan-zhang.com.cn/p/156e55dd.html">https://zone.ivan-zhang.com.cn/p/156e55dd.html</a></p>
+<p>本文链接:  <a href="https://zone.ivanz.cc/p/156e55dd.html">https://zone.ivanz.cc/p/156e55dd.html</a></p>
 
                 
               </div>
@@ -507,7 +507,7 @@
   <div class="license-box my-3">
     <div class="license-title">
       <div>Rust学习-制作一个文本编辑器: Raw Input And Output</div>
-      <div>https://zone.ivan-zhang.com.cn/p/156e55dd</div>
+      <div>https://zone.ivanz.cc/p/156e55dd</div>
     </div>
     <div class="license-meta">
       
@@ -525,7 +525,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2023年11月20日</div>
+          <div>2024年1月10日</div>
         </div>
       
       
