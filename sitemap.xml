@@ -2,6 +2,15 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://zone.ivanz.cc/p/68d94475</loc>
+    
+    <lastmod>2024-01-30</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://zone.ivanz.cc/p/2cf20a7b</loc>
     
     <lastmod>2024-01-30</lastmod>
@@ -21,15 +30,6 @@
   
   <url>
     <loc>https://zone.ivanz.cc/p/b9f66227</loc>
-    
-    <lastmod>2024-01-30</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://zone.ivanz.cc/p/68d94475</loc>
     
     <lastmod>2024-01-30</lastmod>
     
@@ -180,6 +180,13 @@
   
   <url>
     <loc>https://zone.ivanz.cc/tags/%E5%86%85%E7%BD%91%E7%A9%BF%E9%80%8F/</loc>
+    <lastmod>2024-01-30</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://zone.ivanz.cc/tags/%E7%A7%91%E5%AD%A6%E4%B8%8A%E7%BD%91/</loc>
     <lastmod>2024-01-30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
