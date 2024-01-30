@@ -18,22 +18,23 @@
   <meta name="author" content="Ivan Zhang">
   <meta name="keywords" content="">
   
-    <meta name="description" content="The arrangement of modules and dataflow in TCP implementation.  &#96;Lab1&#96;要求实现一个&#96;StreamReassembler&#96;，也就是接收端的&#96;滑动窗口&#96;，包含以下几个功能：  将零散的字节流片段拼接成顺序正确的字节流； 忽略重复传输的数据包； 拒绝过早传输的数据包； 将排序好的字节流传递给上层的ByteStream。">
+    <meta name="description" content="由于最近用的机场并不是很稳定，加上之前买的某云的香港服务器网络状况实在是难以忍受，于是想尝试自己搭建一个V2Ray服务器，一是为了稳定，二是既省时又省钱了，顺便记录一下步骤。 现在我主要是用的服务器是ZgoCloud上洛杉矶1c1g500M1T的服务器，有回国线路优化，延迟可以稳定在150ms，晚上高峰期延迟在200ms。机器本身性能也很不错，算下来一年也就280块钱，可以说相当划算了。如果有兴趣">
 <meta property="og:type" content="article">
-<meta property="og:title" content="CS144计算机网络Lab1: Stitching Substrings into a Byte Stream">
-<meta property="og:url" content="https://zone.ivanz.cc/p/8eb2211f">
+<meta property="og:title" content="搭建一个自己的梯子-使用V2Ray">
+<meta property="og:url" content="https://zone.ivanz.cc/p/2cf20a7b">
 <meta property="og:site_name" content="Ivan Zone">
-<meta property="og:description" content="The arrangement of modules and dataflow in TCP implementation.  &#96;Lab1&#96;要求实现一个&#96;StreamReassembler&#96;，也就是接收端的&#96;滑动窗口&#96;，包含以下几个功能：  将零散的字节流片段拼接成顺序正确的字节流； 忽略重复传输的数据包； 拒绝过早传输的数据包； 将排序好的字节流传递给上层的ByteStream。">
+<meta property="og:description" content="由于最近用的机场并不是很稳定，加上之前买的某云的香港服务器网络状况实在是难以忍受，于是想尝试自己搭建一个V2Ray服务器，一是为了稳定，二是既省时又省钱了，顺便记录一下步骤。 现在我主要是用的服务器是ZgoCloud上洛杉矶1c1g500M1T的服务器，有回国线路优化，延迟可以稳定在150ms，晚上高峰期延迟在200ms。机器本身性能也很不错，算下来一年也就280块钱，可以说相当划算了。如果有兴趣">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://lsky.ivanz.cc/i/2023/10/24/6537b1575e576.png">
-<meta property="article:published_time" content="2023-10-15T08:28:19.000Z">
-<meta property="article:modified_time" content="2024-01-30T07:38:21.679Z">
+<meta property="og:image" content="https://lsky.ivanz.cc/i/2024/01/30/65b895bb1a1e6.png">
+<meta property="og:image" content="https://lsky.ivanz.cc/i/2024/01/30/65b8a9b50c2d1.png">
+<meta property="og:image" content="https://lsky.ivanz.cc/i/2024/01/30/65b8ac85a00ea.png">
+<meta property="article:published_time" content="2024-01-02T22:05:57.000Z">
+<meta property="article:modified_time" content="2024-01-30T08:22:56.539Z">
 <meta property="article:author" content="Ivan Zhang">
-<meta property="article:tag" content="CS144">
-<meta property="article:tag" content="计算机网络">
-<meta property="article:tag" content="Lab">
+<meta property="article:tag" content="V2Ray">
+<meta property="article:tag" content="内网穿透">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://lsky.ivanz.cc/i/2023/10/24/6537b1575e576.png">
+<meta name="twitter:image" content="https://lsky.ivanz.cc/i/2024/01/30/65b895bb1a1e6.png">
   
   
     <meta name="referrer" content="no-referrer-when-downgrade">
@@ -41,7 +42,7 @@
   
     <meta name="google-site-verification" content="QRmYEV3TU5Xl3W3amshmcmMfL2Vl-TKfcOA9E-TKwR0" />
   
-  <title>CS144计算机网络Lab1: Stitching Substrings into a Byte Stream - Ivan Zone</title>
+  <title>搭建一个自己的梯子-使用V2Ray - Ivan Zone</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -250,7 +251,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="CS144计算机网络Lab1: Stitching Substrings into a Byte Stream"></span>
+            <span id="subtitle" data-typed-text="搭建一个自己的梯子-使用V2Ray"></span>
           
         </div>
 
@@ -261,8 +262,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2023-10-15 16:28" pubdate>
-          2023年10月15日 下午
+        <time datetime="2024-01-03 06:05" pubdate>
+          2024年1月3日 早上
         </time>
       </span>
     
@@ -273,7 +274,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          4.4k 字
+          2k 字
         
       </span>
     
@@ -284,7 +285,7 @@
         
         
         
-          37 分钟
+          17 分钟
         
       </span>
     
@@ -322,7 +323,7 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">CS144计算机网络Lab1: Stitching Substrings into a Byte Stream</h1>
+            <h1 id="seo-header">搭建一个自己的梯子-使用V2Ray</h1>
             
               <p class="note note-info">
                 
@@ -335,73 +336,55 @@
             
               <div class="markdown-body">
                 
-                <center>
-  <img src="http://lsky.ivanz.cc/i/2023/10/15/652c095ff0876.png" srcset="/img/loading.gif" lazyload alt="CS144TCPSocket" style="zoom:25%;" /><br>
-  <font color="DimGray" size="3">The arrangement of modules and dataflow in TCP implementation.</font>
-</center>
-`Lab1`要求实现一个`StreamReassembler`，也就是接收端的`滑动窗口`，包含以下几个功能：
-<ul>
-<li>将零散的字节流片段拼接成顺序正确的字节流；</li>
-<li>忽略重复传输的数据包；</li>
-<li>拒绝过早传输的数据包；</li>
-<li>将排序好的字节流传递给上层的<code>ByteStream</code>。</li>
-</ul>
-<h2 id="A-Putting-substrings-in-sequence">A. Putting substrings in sequence</h2>
-<p>在pdf中，作者给出了一个<code>StreamReassembler</code>的简单示意图，不过比较抽象</p>
+                <p>由于最近用的机场并不是很稳定，加上之前买的某云的香港服务器网络状况实在是难以忍受，于是想尝试自己搭建一个<code>V2Ray</code>服务器，一是为了稳定，二是既省时又省钱了，顺便记录一下步骤。</p>
+<p>现在我主要是用的服务器是<a target="_blank" rel="noopener" href="https://clients.zgovps.com/?affid=403"><code>ZgoCloud</code></a>上洛杉矶<code>1c1g500M1T</code>的服务器，有<code>回国线路优化</code>，延迟可以稳定在<code>150ms</code>，晚上高峰期延迟在<code>200ms</code>。机器本身性能也很不错，算下来一年也就280块钱，可以说相当划算了。如果有兴趣购买，可以点击我的<a target="_blank" rel="noopener" href="https://clients.zgovps.com/?affid=403">推广链接</a>。</p>
 <center>
-  <img src="http://lsky.ivanz.cc/i/2023/10/16/652ceff38d891.png" srcset="/img/loading.gif" lazyload alt="StreamReassembler" style="zoom:65%;" /><br>
-  <font color="DimGray" size="3">StreamReassembler.</font>
+  <img src="https://lsky.ivanz.cc/i/2024/01/30/65b895bb1a1e6.png" srcset="/img/loading.gif" lazyload alt="ZgoCloud" style="zoom:25%;" /><br>
 </center>
-<h3 id="首次尝试">首次尝试</h3>
-<p>具体来说，对于外部输入随机排列的<code>substring</code>，使用滑动窗口处理陆续到达的<code>substring</code>并将它们全部储存在<code>buffer_string</code>中，其中滑动窗口是由<code>_reassembled_pt</code>和<code>_end_pt</code>两个指针组成，并保证<code>_end_pt - _reassembled_pt &lt;= _capacity</code>；同时维护一个<code>buffer_check</code>用来储存<code>buffer_string</code>中每个字节的占用情况。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs C++"><span class="hljs-keyword">class</span> <span class="hljs-title class_">StreamReassembler</span> &#123;<br>  <span class="hljs-keyword">private</span>:<br>    <span class="hljs-comment">// Your code here -- add private members as necessary.</span><br>    std::string buffer_string;<br>    std::string buffer_check;<br>    <span class="hljs-type">size_t</span> _reassembled_pt;<br>    <span class="hljs-type">size_t</span> _end_pt;<br>    <br>    <span class="hljs-comment">/*code*/</span><br>&#125;<br></code></pre></td></tr></table></figure>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs C++">StreamReassembler::<span class="hljs-built_in">StreamReassembler</span>(<span class="hljs-type">const</span> <span class="hljs-type">size_t</span> capacity) : <span class="hljs-built_in">buffer_string</span>(<span class="hljs-string">&quot;&quot;</span>), <span class="hljs-built_in">buffer_check</span>(<span class="hljs-string">&quot;&quot;</span>), _reassembled_pt(<span class="hljs-number">0</span>), _end_pt(<span class="hljs-number">-1</span>), _output(capacity), _capacity(capacity) &#123;&#125;<br></code></pre></td></tr></table></figure>
-<p>对于<code>push_substring()</code>，<code>workflow</code>如下：</p>
+<hr>
+<h2 id="介绍">介绍</h2>
+<p>首先准备一台可以访问<code>外网</code>的服务器<code>server</code>，我这里是用的是ZgoCloud的服务器，并在上面通过<code>docker</code>安装了<code>nginx</code>，网络模式为<code>host</code>。并通过<code>certbot</code>配置了<code>ssl</code>证书。</p>
+<p>之后准备一个二级域名如<code>v2ray.example.com</code>，并将它解析到<code>server</code>的<code>ip</code>上。如果域名托管到了如<code>cloudflare</code>之类的平台，需要关闭这个子域名的<code>cdn</code>才行。</p>
+<hr>
+<h2 id="步骤">步骤</h2>
+<h3 id="安装V2Ray">安装V2Ray</h3>
+<p>我这里是用的是别人写好的<a target="_blank" rel="noopener" href="https://github.com/233boy/v2ray">V2Ray一键安装&amp;管理脚本</a>。</p>
+<p>在<code>server</code>上输入以下命令安装：</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs awk">bash &lt;(wget -qO- -o- https:<span class="hljs-regexp">//gi</span>t.io/v2ray.sh)<br></code></pre></td></tr></table></figure>
+<p>安装完成的话会显示如下信息就代表安装完成了：</p>
 <center>
-  <img src="http://lsky.ivanz.cc/i/2023/10/16/652d1588dde32.jpeg" srcset="/img/loading.gif" lazyload alt="StreamReassembler" style="zoom:30%;" /><br>
-  <font color="DimGray" size="3">StreamReassembler.</font>
+  <img src="https://lsky.ivanz.cc/i/2024/01/30/65b8a9b50c2d1.png" srcset="/img/loading.gif" lazyload alt="V2Ray安装完成" style="zoom:50%;" /><br>
 </center>
+<p>可以看到这个时候已经成功生成了一个<code>VMess-TCP</code>配置，现在其实就可以直接使用了。</p>
+<div class="note note-primary">
+            <p>如果server有外/内部防火墙，需要放行对应端口或关闭防火墙。可以通过<code>nmap</code>工具检测对应端口是否有服务。</p>
+          </div>
+<h3 id="通过no-auto-tls新建VMess-WS-TLS配置">通过<code>no-auto-tls</code>新建<code>VMess-WS-TLS</code>配置</h3>
+<p>由于在<code>server</code>上已经部署了<code>nginx</code>接管了443端口，直接添加<code>VMess-WS-TLS</code>配置会报错，<code>V2Ray</code>脚本提供了<code>no-auto-tls</code>工具可以让我们手动通过<code>nginx</code>配置<code>https</code>。</p>
 <ul>
-<li>计算插入<code>data</code>后buffer_string的长度：<code>extended_length = index + data.length()</code>；</li>
-<li>检查<code>extended_length</code>是否超出<code>capacity</code>，若超出则直接<code>return</code>；</li>
-<li>检查<code>eof</code>是否为<code>true</code>，将<code>_end_pt</code>设置成<code>extended_length</code>；</li>
-<li>将<code>buffer_string</code>和<code>buffer_check</code>的长度扩展到<code>extended_length</code>，并写入<code>data</code>同时将对应位置的<code>check</code>置为<code>1</code>；</li>
-<li>如果<code>_reassembled_pt</code>位置上的比特非空，就写入到<code>ByteStream</code>，并右移<code>_reassembled_pt</code>直到遇到空位或<code>_reassembled_pt == _end_pt</code>；</li>
-<li>当<code>_reassembled_pt == _end_pt</code>时，结束<code>ByteStream</code>输入。</li>
-</ul>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs C++"><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">StreamReassembler::push_substring</span><span class="hljs-params">(<span class="hljs-type">const</span> string &amp;data, <span class="hljs-type">const</span> <span class="hljs-type">size_t</span> index, <span class="hljs-type">const</span> <span class="hljs-type">bool</span> eof)</span> </span>&#123;<br><span class="hljs-comment">//    DUMMY_CODE(data, index, eof);</span><br><br>    <span class="hljs-type">size_t</span> extended_length = index + data.<span class="hljs-built_in">length</span>();<br><br>    <span class="hljs-keyword">if</span> (extended_length &gt; _capacity)<br>        <span class="hljs-keyword">return</span>;<br><br>    <span class="hljs-keyword">if</span> (eof)<br>        _end_pt = extended_length;<br><br>    buffer_string.<span class="hljs-built_in">resize</span>(extended_length),<br>    buffer_check.<span class="hljs-built_in">resize</span>(extended_length),<br>    buffer_string.<span class="hljs-built_in">replace</span>(index,data.<span class="hljs-built_in">length</span>(),data);<br>    buffer_check.<span class="hljs-built_in">replace</span>(index,data.<span class="hljs-built_in">length</span>(),data.<span class="hljs-built_in">length</span>(),<span class="hljs-string">&#x27;1&#x27;</span>);<br><br>    <span class="hljs-keyword">while</span>(buffer_check[_reassembled_pt] &amp;&amp; _output.<span class="hljs-built_in">remaining_capacity</span>())&#123;<br>        _output.<span class="hljs-built_in">write</span>(<span class="hljs-built_in">to_string</span>(buffer_string[_reassembled_pt]));<br>        _reassembled_pt++;<br>    &#125;<br><br>    <span class="hljs-keyword">if</span> (_reassembled_pt == _end_pt)<br>        _output.<span class="hljs-built_in">end_input</span>();<br>&#125;<br></code></pre></td></tr></table></figure>
-<p>对于<code>unassembled_bytes()</code>函数，我们需要查看滑动窗口里未被连续填充的区间中填充byte的数量，也就是当<code>_reassembled_pt</code>处为空时，在其之后的<code>substring</code>数量，这里直接遍历一边就好。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs C++"><span class="hljs-function"><span class="hljs-type">size_t</span> <span class="hljs-title">StreamReassembler::unassembled_bytes</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123;<br>    <span class="hljs-type">size_t</span> bytes_cnt = <span class="hljs-number">0</span>;<br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">size_t</span> i = _reassembled_pt; i != buffer_check.<span class="hljs-built_in">length</span>(); i++)<br>        <span class="hljs-keyword">if</span>(buffer_check[i] == <span class="hljs-string">&#x27;1&#x27;</span>) bytes_cnt++;<br>    <span class="hljs-keyword">return</span> bytes_cnt;<br>&#125;<br></code></pre></td></tr></table></figure>
-<p>最后，判断<code>StreamReassembler</code>是否为空</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs C++"><span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">StreamReassembler::empty</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> !<span class="hljs-built_in">unassembled_bytes</span>(); &#125;<br></code></pre></td></tr></table></figure>
-<p>然而，这个方案不能通过测试。</p>
-<h3 id="进一步改进">进一步改进</h3>
-<p>经过复盘发现了一些问题：</p>
-<ol>
-<li>当<code>extended_length</code>超过<code>_capacity</code>时就直接全部抛弃了，没有考虑部分输入的情况，正确的逻辑应该是仅抛弃无法写入的<code>unacceptable</code>字节；</li>
-<li><code>eof</code>也没有考虑<code>unacceptable</code>字节的问题，需要对本次<code>data</code>是否能完整写入进行判定；</li>
-<li>在写入<code>ByteStream</code>时，逐个进行的，并且进行了类型转换。</li>
-<li>除此之外，在一开始进行分析的时候对<code>_reassembled_pt</code>和<code>_end_pt</code>的说明是<code>_end_pt - _reassembled_pt &lt;= _capacity</code>，忽略了<code>_end_pt</code>与<code>eof</code>的联系。</li>
-</ol>
-<p>经过修改新<code>workflow</code>如下：</p>
-<ul>
-<li>计算插入<code>data</code>后<code>buffer_string</code>的长度：<code>extended_length = index + data.length()</code>  ----&gt;<strong>插入长度</strong>；</li>
-<li>计算符合<code>_capacity</code>要求理论最大长度：<code>max_expended_length = _reassembled_pt + _capacity</code>  ----&gt;<strong>最大长度</strong>；</li>
-<li>检查<code>index</code>是否超出<code>capacity</code>，若超出则直接<code>return</code>；</li>
-<li>检查<code>eof</code>是否为<code>true</code>，且如果本次的<code>data</code>能完全插入则令<code>_end_pt = expended_length</code>；</li>
-<li>调整<code>buffer</code>并插入<code>data</code>
-<ul>
-<li>如果<strong>插入长度</strong>大于当前<code>buffer_string</code>的长度，则将<code>buffer_string</code>和<code>buffer_check</code>扩展到<strong>插入长度</strong>；</li>
-<li>写入<code>data</code>同时将对应位置的<code>check</code>置为<code>1</code>；</li>
-<li>如果插入后当前<code>buffer_string</code>的长度大于<strong>最大长度</strong>，则将<code>buffer_string</code>和<code>buffer_check</code>缩短到<strong>最大长度</strong>，抛弃掉<code>unacceptable</code>字节。</li>
-</ul>
+<li>
+<p>首先我们先用<code>v2ray no-auto-tls</code>添加一个配置，生成配置信息如下：</p>
+<center>
+  <img src="https://lsky.ivanz.cc/i/2024/01/30/65b8ac85a00ea.png" srcset="/img/loading.gif" lazyload alt="V2Ray安装完成" style="zoom:75%;" /><br>
+</center>
 </li>
-<li>如果<code>_reassembled_pt</code>位置上的比特非空，就写入到<code>ByteStream</code>，并右移<code>_reassembled_pt</code>直到遇到空位或<code>_output</code>已满；</li>
-<li>当<code>_reassembled_pt == _end_pt</code>时，结束<code>ByteStream</code>输入。</li>
+<li>
+<p>需要注意这几个信息：端口<code>40145</code>、路径<code>/a0337bed-4501-401c-a8f1-585f8e567e6c</code>。使用这个配置的时候，代理的流量会通过<code>域名/a0337bed-4501-401c-a8f1-585f8e567e6c</code>访问本机的<code>40145</code>端口。</p>
+</li>
+<li>
+<p>之后我们就可以通过nginx来配置https了，可以参考如下的<code>conf</code>，自行替换里面的域名、路径和端口就可以了。</p>
+</li>
 </ul>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><code class="hljs C++"><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">StreamReassembler::push_substring</span><span class="hljs-params">(<span class="hljs-type">const</span> string &amp;data, <span class="hljs-type">const</span> <span class="hljs-type">size_t</span> index, <span class="hljs-type">const</span> <span class="hljs-type">bool</span> eof)</span> </span>&#123;<br><span class="hljs-comment">//    DUMMY_CODE(data, index, eof);</span><br>    <span class="hljs-type">size_t</span> expended_length = index + data.<span class="hljs-built_in">length</span>();<br>    <span class="hljs-type">size_t</span> max_expended_length = _reassembled_pt + _capacity;<br><br>    <span class="hljs-keyword">if</span> (index &gt; max_expended_length)<br>        <span class="hljs-keyword">return</span>;<br><br>    <span class="hljs-keyword">if</span> (eof &amp;&amp; expended_length &lt;= max_expended_length)<br>        _end_pt = expended_length;<br><br>    <span class="hljs-keyword">if</span> (expended_length &gt; buffer_string.<span class="hljs-built_in">length</span>()) &#123;<br>        buffer_string.<span class="hljs-built_in">resize</span>(expended_length);<br>        buffer_check.<span class="hljs-built_in">resize</span>(expended_length);<br>    &#125;<br><br>        buffer_string.<span class="hljs-built_in">replace</span>(index, data.<span class="hljs-built_in">length</span>(), data);<br>        buffer_check.<span class="hljs-built_in">replace</span>(index, data.<span class="hljs-built_in">length</span>(), data.<span class="hljs-built_in">length</span>(), <span class="hljs-string">&#x27;1&#x27;</span>);<br><br>    <span class="hljs-keyword">if</span> (buffer_string.<span class="hljs-built_in">length</span>() &gt; max_expended_length)&#123;<br>        buffer_string.<span class="hljs-built_in">resize</span>(max_expended_length);<br>        buffer_check.<span class="hljs-built_in">resize</span>(max_expended_length);<br>    &#125;<br><br>    <span class="hljs-keyword">if</span> (buffer_check[_reassembled_pt] &amp;&amp; _output.<span class="hljs-built_in">remaining_capacity</span>())&#123;<br>        <span class="hljs-type">size_t</span> write_len = <span class="hljs-number">0</span>;<br>        <span class="hljs-keyword">while</span>(buffer_check[_reassembled_pt + write_len] &amp;&amp; _output.<span class="hljs-built_in">remaining_capacity</span>() - write_len) write_len++;<br>        _output.<span class="hljs-built_in">write</span>(buffer_string.<span class="hljs-built_in">substr</span>(_reassembled_pt,write_len));<br>        _reassembled_pt += write_len;<br>    &#125;<br><br>    <span class="hljs-keyword">if</span> (_reassembled_pt == _end_pt)<br>        _output.<span class="hljs-built_in">end_input</span>();<br>&#125;<br></code></pre></td></tr></table></figure>
-<p>通过了<code>test</code>。</p>
-<p>本文链接:  <a href="https://zone.ivanz.cc/p/8eb2211f.html">https://zone.ivanz.cc/p/8eb2211f.html</a></p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs nginx"><span class="hljs-section">server</span> &#123;<br>    <span class="hljs-attribute">listen</span>              <span class="hljs-number">443</span> ssl http2;<br>    <span class="hljs-attribute">listen</span>              [::]:<span class="hljs-number">443</span> ssl http2;<br>    <span class="hljs-attribute">server_name</span>         v2ray.example.com;	<span class="hljs-comment">#此处自行替换配置中的地址（之前设置解析的子域名）</span><br><br>    <span class="hljs-comment"># SSL</span><br>    <span class="hljs-attribute">ssl_certificate</span>     /etc/cert/live/****/fullchain.pem;<br>    <span class="hljs-attribute">ssl_certificate_key</span> /etc/cert/live/****/privkey.pem;<br><br>    <span class="hljs-comment"># logging</span><br>    <span class="hljs-attribute">access_log</span>          /var/log/nginx/access.log combined buffer=<span class="hljs-number">512k</span> flush=<span class="hljs-number">1m</span>;<br>    <span class="hljs-attribute">error_log</span>           /var/log/nginx/<span class="hljs-literal">error</span>.log <span class="hljs-literal">warn</span>;<br><br>    <span class="hljs-comment"># reverse proxy</span><br>    <span class="hljs-section">location</span> /a0337bed-<span class="hljs-number">4501</span>-401c-a8f1-585f8e567e6c &#123; <span class="hljs-comment">#此处自行替换配置中的路径</span><br>	    <span class="hljs-attribute">if</span> (<span class="hljs-variable">$http_upgrade</span> != <span class="hljs-string">&quot;websocket&quot;</span>) &#123;<br>		    <span class="hljs-attribute">return</span> <span class="hljs-number">404</span>;<br>	    &#125;<br>	    <span class="hljs-attribute">proxy_pass</span> http://127.0.0.1:40145;    <span class="hljs-comment">#此处自行替换配置中的端口</span><br>	    <span class="hljs-attribute">proxy_redirect</span> <span class="hljs-literal">off</span>;<br>	    <span class="hljs-attribute">proxy_http_version</span> <span class="hljs-number">1</span>.<span class="hljs-number">1</span>;<br>	    <span class="hljs-attribute">proxy_set_header</span> Upgrade <span class="hljs-variable">$http_upgrade</span>;<br>	    <span class="hljs-attribute">proxy_set_header</span> Connection <span class="hljs-string">&quot;upgrade&quot;</span>;<br>	    <span class="hljs-attribute">proxy_set_header</span> Host <span class="hljs-variable">$host</span>;<br>	    <span class="hljs-attribute">proxy_set_header</span> X-Real-IP <span class="hljs-variable">$remote_addr</span>;<br>	    <span class="hljs-attribute">proxy_set_header</span> X-Forwarded-For <span class="hljs-variable">$proxy_add_x_forwarded_for</span>;<br>	    <span class="hljs-attribute">proxy_read_timeout</span> <span class="hljs-number">5d</span>;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<h3 id="使用">使用</h3>
+<p>这一步就比较简单了，可以在网上随便找一个在线订阅转换网站，输入上面配置中的<code>链接(URL):vmess://****</code>，生成你想要的配置，在本地通过<code>clash</code>或者<code>v2ray</code>订阅下载配置就可以快乐的上网了。</p>
+<hr>
+<h2 id="打开BBR优化">打开BBR优化</h2>
+<p>控制台执行<code>v2ray bbr</code>打开<code>BBR</code>优化，可以提升网络性能，能够提供更好的用户体验，减少拥塞和延迟问题。</p>
+<hr>
+<h2 id="其他">其他</h2>
+<p>其他更多操作可以参考<a target="_blank" rel="noopener" href="https://github.com/233boy/v2ray/wiki/V2Ray%E6%90%AD%E5%BB%BA%E8%AF%A6%E7%BB%86%E5%9B%BE%E6%96%87%E6%95%99%E7%A8%8B#v2ray-%E8%84%9A%E6%9C%AC%E5%B8%AE%E5%8A%A9">帮助</a>。</p>
+<p>本文链接:  <a href="https://zone.ivanz.cc/p/undefined.html">https://zone.ivanz.cc/p/undefined.html</a></p>
 
                 
               </div>
@@ -410,36 +393,13 @@
             <div>
               <div class="post-metas my-3">
   
-    <div class="post-meta mr-3 d-flex align-items-center">
-      <i class="iconfont icon-category"></i>
-      
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" class="category-chain-item">计算机网络</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-    </div>
-  
   
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/CS144/" class="print-no-link">#CS144</a>
+        <a href="/tags/V2Ray/" class="print-no-link">#V2Ray</a>
       
-        <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" class="print-no-link">#计算机网络</a>
-      
-        <a href="/tags/Lab/" class="print-no-link">#Lab</a>
+        <a href="/tags/%E5%86%85%E7%BD%91%E7%A9%BF%E9%80%8F/" class="print-no-link">#内网穿透</a>
       
     </div>
   
@@ -451,8 +411,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>CS144计算机网络Lab1: Stitching Substrings into a Byte Stream</div>
-      <div>https://zone.ivanz.cc/p/8eb2211f</div>
+      <div>搭建一个自己的梯子-使用V2Ray</div>
+      <div>https://zone.ivanz.cc/p/2cf20a7b</div>
     </div>
     <div class="license-meta">
       
@@ -464,7 +424,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2023年10月15日</div>
+          <div>2024年1月3日</div>
         </div>
       
       
@@ -501,9 +461,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/p/b9f66227" title="CS144计算机网络Lab2: The TCP Receiver">
+                      <a href="/p/68d94475" title="使用V2Ray进行内网穿透">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">CS144计算机网络Lab2: The TCP Receiver</span>
+                        <span class="hidden-mobile">使用V2Ray进行内网穿透</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -511,8 +471,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/p/30fba476" title="CS144计算机网络Lab0: Networking Warmup">
-                        <span class="hidden-mobile">CS144计算机网络Lab0: Networking Warmup</span>
+                      <a href="/p/a052054" title="Rust学习-制作一个文本编辑器: A Text Editor">
+                        <span class="hidden-mobile">Rust学习-制作一个文本编辑器: A Text Editor</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
